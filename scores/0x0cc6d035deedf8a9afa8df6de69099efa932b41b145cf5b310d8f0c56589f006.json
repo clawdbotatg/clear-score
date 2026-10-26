@@ -1,0 +1,434 @@
+{
+ "hash": "0x0cc6d035deedf8a9afa8df6de69099efa932b41b145cf5b310d8f0c56589f006",
+ "file": "registry/uniswap/calldata-UniswapV3Router02.json",
+ "kind": "calldata",
+ "registry": "b70998caa5dab184243a298a0253b5530428b0f2",
+ "deployments": [
+  {
+   "chainId": 1,
+   "address": "0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45"
+  }
+ ],
+ "auditedBy": [],
+ "model": "claude-opus-5-5 (high)",
+ "reader": "claude-sonnet-5-5",
+ "prompt": "7bcbb754c1e7",
+ "date": "2026-10-26T15:00Z",
+ "answer": {
+  "formats": [
+   {
+    "key": "exactInput((bytes path, address recipient, uint256 amountIn, uint256 amountOutMinimum) params)",
+    "effects": [
+     "The signer sends exactly amountIn of the first token in path; the router pulls it with transferFrom, or wraps the signer's ETH when the first token is WETH9 and ETH was sent.",
+     "The recipient receives at least amountOutMinimum of the last token in path; the call reverts below that.",
+     "Recipient 0x...01 means the signer; recipient 0x...02 means the router keeps the output, and anyone can then sweep it.",
+     "amountIn = 0 swaps the router's own balance of the first token instead of pulling from the signer.",
+     "ETH sent with the call and not used for the swap stays in the router; this call does not refund it."
+    ],
+    "shown": "\"Swap\", with the amount sent in the first path token, the minimum received in the last path token, and the beneficiary address.",
+    "findings": [
+     {
+      "severity": "critical",
+      "axis": "completeness",
+      "kind": "hidden-value",
+      "title": "exactInput is payable but no field shows the native ETH sent with the call.",
+      "evidence": "V3SwapRouter.exactInput is `external payable`; PeripheryPayments.pay: `if (token == WETH9 && address(this).balance >= value) { IWETH9(WETH9).deposit{value: value}(); ...}`. The descriptor's exactInput fields have no `@.value` field.",
+      "fix": "Add a field {\"path\": \"@.value\", \"label\": \"ETH sent\", \"format\": \"amount\"}.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "exactInput shows the recipient flags 0x...01 (signer) and 0x...02 (router) as raw addresses.",
+      "evidence": "V3SwapRouter.exactInputInternal: `if (recipient == Constants.MSG_SENDER) recipient = msg.sender; else if (recipient == Constants.ADDRESS_THIS) recipient = address(this);`. The Beneficiary field has no `senderAddress`.",
+      "fix": "Add \"senderAddress\": [\"0x0000000000000000000000000000000000000001\"] to the Beneficiary field params. Also make 0x...02 visibly mean the router.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "exactInput shows amountIn 0 as '0', but the code then swaps the router's whole balance.",
+      "evidence": "V3SwapRouter.exactInput: `if (params.amountIn == Constants.CONTRACT_BALANCE) { hasAlreadyPaid = true; params.amountIn = IERC20(tokenIn).balanceOf(address(this)); }`, with CONTRACT_BALANCE = 0.",
+      "fix": "Show a message such as \"Router balance\" when amountIn is 0.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 0,
+      "signerEffects": 2,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "right"
+      ],
+      "notes": "SABAI out 1020.349 and WETH in 0.000905 (minimum 0.000903) both match the screen."
+     }
+    ],
+    "glance": 55,
+    "depth": 72
+   },
+   {
+    "key": "exactInputSingle((address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 amountIn, uint256 amountOutMinimum, uint160 sqrtPriceLimitX96) params)",
+    "effects": [
+     "The signer sends up to amountIn of tokenIn, pulled with transferFrom, or wrapped from sent ETH when tokenIn is WETH9.",
+     "The recipient receives at least amountOutMinimum of tokenOut from the fee-tier pool.",
+     "A non-zero sqrtPriceLimitX96 can stop the swap early, so less than amountIn leaves.",
+     "Recipient 0x...01 means the signer; 0x...02 means the router keeps the output.",
+     "amountIn = 0 swaps the router's own balance of tokenIn.",
+     "ETH sent and not used stays in the router."
+    ],
+    "shown": "\"swap\", with the amount sent in tokenIn, the minimum received in tokenOut, the pool fee tier as a percent, and the beneficiary.",
+    "findings": [
+     {
+      "severity": "critical",
+      "axis": "completeness",
+      "kind": "hidden-value",
+      "title": "exactInputSingle is payable but no field shows the native ETH sent with the call.",
+      "evidence": "V3SwapRouter.exactInputSingle is `external payable`; PeripheryPayments.pay wraps router ETH when token == WETH9. The descriptor's exactInputSingle fields have no `@.value` field.",
+      "fix": "Add a field {\"path\": \"@.value\", \"label\": \"ETH sent\", \"format\": \"amount\"}.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "exactInputSingle shows the recipient flags 0x...01 and 0x...02 as raw addresses.",
+      "evidence": "V3SwapRouter.exactInputInternal maps Constants.MSG_SENDER to msg.sender and Constants.ADDRESS_THIS to address(this). The Beneficiary field has no `senderAddress`.",
+      "fix": "Add \"senderAddress\": [\"0x0000000000000000000000000000000000000001\"] to the Beneficiary field params.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "exactInputSingle shows amountIn 0 literally, but the code then swaps the router's whole balance.",
+      "evidence": "V3SwapRouter.exactInputSingle: `if (params.amountIn == Constants.CONTRACT_BALANCE) { ... params.amountIn = IERC20(params.tokenIn).balanceOf(address(this)); }`.",
+      "fix": "Show a message such as \"Router balance\" when amountIn is 0.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "hidden-value",
+      "title": "exactInputSingle hides sqrtPriceLimitX96, which can make less than the 'Send' amount leave.",
+      "evidence": "V3SwapRouter.exactInputInternal passes `sqrtPriceLimitX96` to pool.swap; the descriptor has no field for params.sqrtPriceLimitX96.",
+      "fix": "Label the amount \"Send (up to)\" or add the price limit as a field.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "exactInputSingle intent is lowercase 'swap', unlike its sibling formats.",
+      "evidence": "descriptor exactInputSingle: \"intent\": \"swap\"; the other formats use \"Swap\".",
+      "fix": "Change the intent to \"Swap\".",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 1,
+      "signerEffects": 2,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "right"
+      ],
+      "notes": "WETH out 0.006471 and USDT in 13.97 (minimum 13.90) match the screen."
+     }
+    ],
+    "glance": 55,
+    "depth": 72
+   },
+   {
+    "key": "exactOutput((bytes path, address recipient, uint256 amountOut, uint256 amountInMaximum) params)",
+    "effects": [
+     "The recipient receives exactly amountOut of the first token in the reversed path.",
+     "The signer pays at most amountInMaximum of the last token in the path, pulled with transferFrom, or wrapped from sent ETH when it is WETH9.",
+     "Recipient 0x...01 means the signer; 0x...02 means the router keeps the output.",
+     "ETH sent and not used stays in the router; this call does not refund it."
+    ],
+    "shown": "\"Swap\", with the maximum paid in the input token, the exact amount received in the output token, and the beneficiary.",
+    "findings": [
+     {
+      "severity": "critical",
+      "axis": "completeness",
+      "kind": "hidden-value",
+      "title": "exactOutput is payable but no field shows the native ETH sent with the call.",
+      "evidence": "V3SwapRouter.exactOutput is `external payable`; PeripheryPayments.pay wraps router ETH when token == WETH9, and leftover ETH is not refunded. The descriptor's exactOutput fields have no `@.value` field.",
+      "fix": "Add a field {\"path\": \"@.value\", \"label\": \"ETH sent\", \"format\": \"amount\"}.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "exactOutput shows the recipient flags 0x...01 and 0x...02 as raw addresses.",
+      "evidence": "V3SwapRouter.exactOutputInternal: `if (recipient == Constants.MSG_SENDER) recipient = msg.sender; else if (recipient == Constants.ADDRESS_THIS) recipient = address(this);`. The Beneficiary field has no `senderAddress`.",
+      "fix": "Add \"senderAddress\": [\"0x0000000000000000000000000000000000000001\"] to the Beneficiary field params.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 2,
+      "signerEffects": 2,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "right"
+      ],
+      "notes": "SABAI in 2636.309 exact and WETH out 0.0023536 under the 0.0023606 maximum both match."
+     }
+    ],
+    "glance": 55,
+    "depth": 75
+   },
+   {
+    "key": "exactOutputSingle((address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 amountOut, uint256 amountInMaximum, uint160 sqrtPriceLimitX96) params)",
+    "effects": [
+     "The recipient receives amountOut of tokenOut; when sqrtPriceLimitX96 is non-zero the exact-output check is skipped, so less can arrive.",
+     "The signer pays at most amountInMaximum of tokenIn, pulled with transferFrom, or wrapped from sent ETH when tokenIn is WETH9.",
+     "Recipient 0x...01 means the signer; 0x...02 means the router keeps the output.",
+     "ETH sent and not used stays in the router."
+    ],
+    "shown": "\"Swap\", with the maximum paid in tokenIn, the amount received in tokenOut, the pool fee tier, and the beneficiary.",
+    "findings": [
+     {
+      "severity": "critical",
+      "axis": "completeness",
+      "kind": "hidden-value",
+      "title": "exactOutputSingle is payable but no field shows the native ETH sent with the call.",
+      "evidence": "V3SwapRouter.exactOutputSingle is `external payable`; PeripheryPayments.pay wraps router ETH when token == WETH9. The descriptor's exactOutputSingle fields have no `@.value` field.",
+      "fix": "Add a field {\"path\": \"@.value\", \"label\": \"ETH sent\", \"format\": \"amount\"}.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "completeness",
+      "kind": "hidden-value",
+      "title": "exactOutputSingle hides sqrtPriceLimitX96; a non-zero limit lets less than 'Amount to Receive' arrive.",
+      "evidence": "V3SwapRouter.exactOutputInternal: `if (sqrtPriceLimitX96 == 0) require(amountOutReceived == amountOut);`. The descriptor has no field for params.sqrtPriceLimitX96.",
+      "fix": "Add a field for params.sqrtPriceLimitX96 (raw, labeled \"Price limit (0 = none)\"), or label the amount \"Receive (up to)\".",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "exactOutputSingle shows the recipient flags 0x...01 and 0x...02 as raw addresses.",
+      "evidence": "V3SwapRouter.exactOutputInternal maps Constants.MSG_SENDER and Constants.ADDRESS_THIS. The Beneficiary field has no `senderAddress`.",
+      "fix": "Add \"senderAddress\": [\"0x0000000000000000000000000000000000000001\"] to the Beneficiary field params.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 3,
+      "signerEffects": 2,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "right"
+      ],
+      "notes": "QNT in 0.0134 exact and WETH out 0.000465 under the 0.000509 maximum both match. The reader was unsure whether 0.0134 is exact."
+     },
+     {
+      "index": 5,
+      "signerEffects": 0,
+      "shownRight": 0,
+      "reader": [],
+      "notes": "Synthetic. The Unlimited threshold renders correctly."
+     }
+    ],
+    "glance": 55,
+    "depth": 68
+   },
+   {
+    "key": "swapExactTokensForTokens(uint256 amountIn, uint256 amountOutMin, address[] path, address to)",
+    "effects": [
+     "The signer sends amountIn of path[0] to the first V2 pair, pulled with transferFrom, or wrapped from sent ETH when path[0] is WETH9.",
+     "The recipient receives at least amountOutMin of path[-1], measured as the recipient's balance change.",
+     "Recipient 0x...01 means the signer; 0x...02 means the router keeps the output.",
+     "amountIn = 0 swaps the router's own balance of path[0].",
+     "ETH sent and not used stays in the router."
+    ],
+    "shown": "\"Swap\", with the amount sent in path[0], the minimum received in path[-1], and the recipient.",
+    "findings": [
+     {
+      "severity": "critical",
+      "axis": "completeness",
+      "kind": "hidden-value",
+      "title": "swapExactTokensForTokens is payable but no field shows the native ETH sent with the call.",
+      "evidence": "V2SwapRouter.swapExactTokensForTokens is `external payable` and calls `pay(path[0], ...)`, which wraps router ETH when the token is WETH9. The descriptor has no `@.value` field.",
+      "fix": "Add a field {\"path\": \"@.value\", \"label\": \"ETH sent\", \"format\": \"amount\"}.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "swapExactTokensForTokens shows the recipient flags 0x...01 and 0x...02 as raw addresses.",
+      "evidence": "V2SwapRouter.swapExactTokensForTokens: `if (to == Constants.MSG_SENDER) to = msg.sender; else if (to == Constants.ADDRESS_THIS) to = address(this);`. The Recipient field has no `senderAddress`.",
+      "fix": "Add \"senderAddress\": [\"0x0000000000000000000000000000000000000001\"] to the Recipient field params.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "swapExactTokensForTokens shows amountIn 0 literally, but the code then swaps the router's balance.",
+      "evidence": "V2SwapRouter.swapExactTokensForTokens: `if (amountIn == Constants.CONTRACT_BALANCE) { hasAlreadyPaid = true; amountIn = IERC20(path[0]).balanceOf(address(this)); }`.",
+      "fix": "Show a message such as \"Router balance\" when amountIn is 0.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 6,
+      "signerEffects": 0,
+      "shownRight": 0,
+      "reader": [],
+      "notes": "Synthetic. Tokens and amounts render correctly from the code."
+     }
+    ],
+    "glance": 55,
+    "depth": 72
+   },
+   {
+    "key": "swapTokensForExactTokens(uint256 amountOut, uint256 amountInMax, address[] path, address to)",
+    "effects": [
+     "The recipient receives amountOut of path[-1] through V2 pairs.",
+     "The signer pays the computed amountIn, at most amountInMax, of path[0], pulled with transferFrom, or wrapped from sent ETH when path[0] is WETH9.",
+     "Recipient 0x...01 means the signer; 0x...02 means the router keeps the output.",
+     "ETH sent and not used stays in the router."
+    ],
+    "shown": "\"Swap\", with the amount received in path[-1], the maximum sent in path[0] (Unlimited above 2^255), and the recipient, with 0x...01 shown as the sender.",
+    "findings": [
+     {
+      "severity": "critical",
+      "axis": "completeness",
+      "kind": "hidden-value",
+      "title": "swapTokensForExactTokens is payable but no field shows the native ETH sent with the call.",
+      "evidence": "V2SwapRouter.swapTokensForExactTokens is `external payable` and calls `pay(path[0], msg.sender, ...)`, which wraps router ETH when the token is WETH9. The descriptor has no `@.value` field.",
+      "fix": "Add a field {\"path\": \"@.value\", \"label\": \"ETH sent\", \"format\": \"amount\"}.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "swapTokensForExactTokens shows recipient 0x...02 (the router keeps the output) as a raw address.",
+      "evidence": "V2SwapRouter.swapTokensForExactTokens: `else if (to == Constants.ADDRESS_THIS) to = address(this);`. The Recipient field maps only 0x...01 through `senderAddress`.",
+      "fix": "Make 0x0000000000000000000000000000000000000002 render as the router, for example through a local address name.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 7,
+      "signerEffects": 0,
+      "shownRight": 0,
+      "reader": [],
+      "notes": "Synthetic. Tokens and amounts render correctly from the code."
+     },
+     {
+      "index": 8,
+      "signerEffects": 0,
+      "shownRight": 0,
+      "reader": [],
+      "notes": "Synthetic. The Unlimited threshold renders correctly."
+     }
+    ],
+    "glance": 55,
+    "depth": 75
+   }
+  ],
+  "couldNotCheck": [
+   "No mined case sends non-zero ETH or uses the recipient flags 0x...01/0x...02, so the ETH-wrap and flag paths were judged from the code only."
+  ]
+ },
+ "cost": 0.598,
+ "account": "austingriffith",
+ "seconds": 116,
+ "rubric": "v1.1",
+ "formats": {
+  "exactInput((bytes path, address recipient, uint256 amountIn, uint256 amountOutMinimum) params)": {
+   "grade": "F",
+   "truth": 25,
+   "clarity": 75,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 1,
+   "warnings": 2,
+   "worst": "exactInput is payable but no field shows the native ETH sent with the call.",
+   "comprehension": 100
+  },
+  "exactInputSingle((address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 amountIn, uint256 amountOutMinimum, uint160 sqrtPriceLimitX96) params)": {
+   "grade": "F",
+   "truth": 25,
+   "clarity": 75,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 1,
+   "warnings": 2,
+   "worst": "exactInputSingle is payable but no field shows the native ETH sent with the call.",
+   "comprehension": 100
+  },
+  "exactOutput((bytes path, address recipient, uint256 amountOut, uint256 amountInMaximum) params)": {
+   "grade": "F",
+   "truth": 25,
+   "clarity": 81,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 1,
+   "warnings": 1,
+   "worst": "exactOutput is payable but no field shows the native ETH sent with the call.",
+   "comprehension": 100
+  },
+  "exactOutputSingle((address tokenIn, address tokenOut, uint24 fee, address recipient, uint256 amountOut, uint256 amountInMaximum, uint160 sqrtPriceLimitX96) params)": {
+   "grade": "F",
+   "truth": 25,
+   "clarity": 80,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 1,
+   "warnings": 2,
+   "worst": "exactOutputSingle is payable but no field shows the native ETH sent with the call.",
+   "comprehension": 100
+  },
+  "swapExactTokensForTokens(uint256 amountIn, uint256 amountOutMin, address[] path, address to)": {
+   "grade": "F",
+   "truth": 25,
+   "clarity": 54,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 1,
+   "warnings": 2,
+   "worst": "swapExactTokensForTokens is payable but no field shows the native ETH sent with the call.",
+   "comprehension": null
+  },
+  "swapTokensForExactTokens(uint256 amountOut, uint256 amountInMax, address[] path, address to)": {
+   "grade": "F",
+   "truth": 25,
+   "clarity": 60,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 1,
+   "warnings": 1,
+   "worst": "swapTokensForExactTokens is payable but no field shows the native ETH sent with the call.",
+   "comprehension": null
+  }
+ },
+ "summary": {
+  "grade": "F",
+  "truth": 25,
+  "clarity": 71,
+  "functions": "6F",
+  "incomplete": true,
+  "worst": "exactInput is payable but no field shows the native ETH sent with the call."
+ }
+}

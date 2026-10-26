@@ -1,0 +1,216 @@
+{
+ "hash": "0x081263d189cd9bba25c3b53561bd73dd4a791b7ad5a27c91569080402eccc595",
+ "file": "registry/ethena/calldata-ethena.json",
+ "kind": "calldata",
+ "registry": "b70998caa5dab184243a298a0253b5530428b0f2",
+ "deployments": [
+  {
+   "chainId": 1,
+   "address": "0x9d39a5de30e57443bff2a8307a4256c8797a3497"
+  }
+ ],
+ "auditedBy": [
+  "0x3846c3a30e62075fa916216b35ef04b8f53931f6"
+ ],
+ "model": "claude-opus-5-5 (high)",
+ "reader": "claude-sonnet-5-5",
+ "prompt": "7bcbb754c1e7",
+ "date": "2026-10-26T15:00Z",
+ "answer": {
+  "formats": [
+   {
+    "key": "cooldownShares(uint256 shares)",
+    "effects": [
+     "Burns the `shares` amount of the signer's sUSDe.",
+     "Moves previewRedeem(shares) USDe from the vault to the silo and adds it to the signer's pending cooldown amount.",
+     "Sets the end of the signer's cooldown to now plus cooldownDuration, for the whole pending amount, including USDe already in cooldown.",
+     "The signer can claim the USDe only later, with unstake, after the cooldown ends."
+    ],
+    "shown": "The screen shows 'Cooldown Shares' and the sUSDe amount that the transaction burns.",
+    "findings": [
+     {
+      "severity": "critical",
+      "axis": "completeness",
+      "kind": "hidden-effect",
+      "title": "cooldownShares restarts the cooldown timer for USDe already in cooldown, and the screen does not say so.",
+      "evidence": "StakedUSDeV2.cooldownShares: `cooldowns[msg.sender].cooldownEnd = uint104(block.timestamp) + cooldownDuration; cooldowns[msg.sender].underlyingAmount += uint152(assets);`. The descriptor shows only intent \"Cooldown Shares\" and the field 'Amount' (#.shares).",
+      "fix": "Change the intent to \"Start cooldown; restarts any pending cooldown\", or add an interpolatedIntent such as \"Unstake {shares}; resets timer of pending cooldown\".",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "cooldownShares uses the jargon intent 'Cooldown Shares' and does not say the USDe comes later through unstake.",
+      "evidence": "descriptor intent \"Cooldown Shares\", interpolatedIntent null. In StakedUSDeV2.cooldownShares, `_withdraw(msg.sender, address(silo), msg.sender, assets, shares)` sends the USDe to the silo, not to the signer.",
+      "fix": "Set intent \"Start unstaking sUSDe\" and interpolatedIntent \"Start cooldown to unstake {shares}\". Label the field 'sUSDe to unstake'.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "cooldownShares does not show the USDe amount that the signer can claim later, because it comes from the exchange rate.",
+      "evidence": "StakedUSDeV2.cooldownShares: `assets = previewRedeem(shares);`. Case 0 moves 1853468.8 USDe to the silo (signer null), and no field shows this amount.",
+      "groundTruth": true
+     }
+    ],
+    "cases": [
+     {
+      "index": 0,
+      "signerEffects": 1,
+      "shownRight": 1,
+      "reader": [
+       "right"
+      ],
+      "notes": "The screen shows the sUSDe burn of 1515266.44 right. The USDe moved to the silo for the signer's claim does not appear, but that amount depends on the exchange rate."
+     }
+    ],
+    "glance": 45,
+    "depth": 55
+   },
+   {
+    "key": "cooldownAssets(uint256 assets)",
+    "effects": [
+     "Burns previewWithdraw(assets) of the signer's sUSDe, rounded up.",
+     "Moves `assets` USDe from the vault to the silo and adds it to the signer's pending cooldown amount.",
+     "Sets the end of the signer's cooldown to now plus cooldownDuration, for the whole pending amount, including USDe already in cooldown.",
+     "The signer can claim the USDe only later, with unstake."
+    ],
+    "shown": "The screen shows 'Cooldown Assets' and a USDe 'Amount', which is the USDe that goes into cooldown.",
+    "findings": [
+     {
+      "severity": "critical",
+      "axis": "completeness",
+      "kind": "hidden-effect",
+      "title": "cooldownAssets restarts the cooldown timer for USDe already in cooldown, and the screen does not say so.",
+      "evidence": "StakedUSDeV2.cooldownAssets: `cooldowns[msg.sender].cooldownEnd = uint104(block.timestamp) + cooldownDuration; cooldowns[msg.sender].underlyingAmount += uint152(assets);`. The descriptor shows only intent \"Cooldown Assets\" and the field 'Amount'.",
+      "fix": "Change the intent to \"Start cooldown; restarts any pending cooldown\".",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "cooldownAssets labels the USDe value 'Amount', so the signer may think USDe leaves the wallet.",
+      "evidence": "descriptor field label \"Amount\", token 0x4c9EDD...68B3 (USDe), path #.assets. In StakedUSDeV2.cooldownAssets, sUSDe is burned from the signer and the USDe is credited to the cooldown.",
+      "fix": "Label the field \"USDe to claim after cooldown\". Set intent \"Start unstaking sUSDe\" and interpolatedIntent \"Unstake sUSDe for {assets} after cooldown\".",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "cooldownAssets does not show the sUSDe that it burns, because the exchange rate sets that amount.",
+      "evidence": "StakedUSDeV2.cooldownAssets: `shares = previewWithdraw(assets); ... _withdraw(msg.sender, address(silo), msg.sender, assets, shares);`",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 40,
+    "depth": 45
+   },
+   {
+    "key": "unstake(address receiver)",
+    "effects": [
+     "Sends the signer's whole pending cooldown amount of USDe from the silo to `receiver`.",
+     "Sets the signer's pending cooldown amount and end time to zero.",
+     "No sUSDe leaves the signer."
+    ],
+    "shown": "The screen shows 'Unstake' and the receiver address, but no asset and no amount.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "unstake uses the intent 'Unstake', which does not name USDe and makes the blind reader expect sUSDe to leave.",
+      "evidence": "descriptor intent \"Unstake\". StakedUSDeV2.unstake only calls `silo.withdraw(receiver, assets)`. In case 1, the reader wrote 'staked token (likely sUSDe) from my wallet', but the only signer effect is USDe in.",
+      "fix": "Set intent \"Claim USDe after cooldown\" and interpolatedIntent \"Claim cooled-down USDe to {receiver}\".",
+      "groundTruth": true
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "unstake does not show the USDe amount that the receiver gets, because it comes from storage.",
+      "evidence": "StakedUSDeV2.unstake: `uint256 assets = userCooldown.underlyingAmount; ... silo.withdraw(receiver, assets);`. In case 1 the signer receives 377.267452 USDe, and the screen shows no amount.",
+      "groundTruth": true
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "other",
+      "title": "unstake limits the receiver addressName types to eoa and wallet, but any address can receive the USDe.",
+      "evidence": "descriptor unstake field 'Receiver' params types [\"eoa\",\"wallet\"]. StakedUSDeV2.unstake accepts any `address receiver`.",
+      "fix": "Remove the `types` restriction on the Receiver field, or add \"contract\".",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 1,
+      "signerEffects": 1,
+      "shownRight": 0,
+      "reader": [
+       "partial"
+      ],
+      "notes": "The signer receives 377.27 USDe. The screen shows the receiver right, but no asset and no amount. The reader guessed USDe and also wrongly expected sUSDe to leave."
+     }
+    ],
+    "glance": 40,
+    "depth": 30
+   }
+  ],
+  "couldNotCheck": [
+   "Whether the signer in case 0 already had a pending cooldown, so I could not confirm the timer reset from a mined case.",
+   "IStakedUSDeCooldown and the other interface files are omitted (14 sources omitted), so I could not check the UserCooldown struct layout."
+  ]
+ },
+ "cost": 0.391,
+ "account": "ethereum_foundation",
+ "seconds": 71,
+ "rubric": "v1.1",
+ "formats": {
+  "cooldownShares(uint256 shares)": {
+   "grade": "F",
+   "truth": 25,
+   "clarity": 75,
+   "measured": true,
+   "groundTruth": true,
+   "critical": 1,
+   "warnings": 1,
+   "worst": "cooldownShares restarts the cooldown timer for USDe already in cooldown, and the screen does not say so.",
+   "comprehension": 100
+  },
+  "cooldownAssets(uint256 assets)": {
+   "grade": "F",
+   "truth": 25,
+   "clarity": 37,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 1,
+   "warnings": 1,
+   "worst": "cooldownAssets restarts the cooldown timer for USDe already in cooldown, and the screen does not say so.",
+   "comprehension": null
+  },
+  "unstake(address receiver)": {
+   "grade": "C",
+   "truth": 100,
+   "clarity": 34,
+   "measured": true,
+   "groundTruth": true,
+   "critical": 0,
+   "warnings": 2,
+   "worst": "unstake uses the intent 'Unstake', which does not name USDe and makes the blind reader expect sUSDe to leave.",
+   "comprehension": 50
+  }
+ },
+ "summary": {
+  "grade": "F",
+  "truth": 50,
+  "clarity": 49,
+  "functions": "1C 2F",
+  "incomplete": true,
+  "worst": "cooldownShares restarts the cooldown timer for USDe already in cooldown, and the screen does not say so."
+ }
+}

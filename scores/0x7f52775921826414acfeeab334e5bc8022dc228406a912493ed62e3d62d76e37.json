@@ -1,0 +1,755 @@
+{
+ "hash": "0x7f52775921826414acfeeab334e5bc8022dc228406a912493ed62e3d62d76e37",
+ "file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+ "kind": "calldata",
+ "registry": "b70998caa5dab184243a298a0253b5530428b0f2",
+ "deployments": [
+  {
+   "chainId": 56,
+   "address": "0xdef171fe48cf0115b1d80b88dc8eab59176fee57"
+  },
+  {
+   "chainId": 1,
+   "address": "0xdef171fe48cf0115b1d80b88dc8eab59176fee57"
+  },
+  {
+   "chainId": 137,
+   "address": "0xdef171fe48cf0115b1d80b88dc8eab59176fee57"
+  }
+ ],
+ "auditedBy": [
+  "0x3846c3a30e62075fa916216b35ef04b8f53931f6"
+ ],
+ "model": "claude-opus-5-5 (high)",
+ "reader": "claude-sonnet-5-5",
+ "prompt": "7bcbb754c1e7",
+ "date": "2026-10-26T15:00Z",
+ "answer": {
+  "formats": [
+   {
+    "key": "simpleBuy((address fromToken, address toToken, uint256 fromAmount, uint256 toAmount, uint256 expectedAmount, address[] callees, bytes exchangeData, uint256[] startIndexes, uint256[] values, address beneficiary, address partner, uint256 feePercent, bytes permit, uint256 deadline, bytes16 uuid) data)",
+    "effects": [
+     "Takes up to fromAmount of fromToken from the signer (or that much ETH as msg.value when fromToken is the ETH sentinel).",
+     "Buys exactly toAmount of toToken and sends it to beneficiary (the signer when beneficiary is zero).",
+     "Refunds the unspent fromToken to the signer.",
+     "Takes a partner or protocol fee set by partner/feePercent (and positive slippage) before paying the beneficiary.",
+     "May submit a signer's permit that sets an allowance on fromToken."
+    ],
+    "shown": "\"Swap\" with Amount to Send (fromAmount of fromToken), Receive before fees (toAmount of toToken) and Beneficiary.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "simpleBuy labels the maximum input as 'Amount to Send' and the exact output as a pre-fee minimum.",
+      "evidence": "descriptor simpleBuy: data.fromAmount uses sendAmount 'Amount to Send', data.toAmount uses minReceiveAmount 'Receive before fees'. In a buy, fromAmount is a ceiling with the rest refunded, and toAmount is the exact amount bought.",
+      "fix": "Use maxSendAmount ('Maximum to Send') for data.fromAmount and a 'Amount to Buy' label for data.toAmount; set intent to 'Buy'.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "completeness",
+      "kind": "hidden-value",
+      "title": "simpleBuy hides partner and feePercent, which decide the fee cut from what the beneficiary receives.",
+      "evidence": "descriptor simpleBuy shows no data.partner or data.feePercent field. The label 'Receive before fees' admits a fee but does not give its size.",
+      "fix": "Add data.feePercent (and data.partner) fields, or an interpolated intent that names the fee.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "simpleBuy beneficiary is limited to EOA and a zero address defaults to the sender.",
+      "evidence": "definitions.beneficiary types ['eoa']. A contract beneficiary is allowed, and a zero beneficiary means msg.sender, but the field would show the literal zero address.",
+      "fix": "Allow types eoa and contract, and add a note or senderAddress handling for the zero address.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "simpleBuy permit bytes are hidden; they can set an allowance on the signer's token.",
+      "evidence": "data.permit is not displayed. Augustus forwards it to the token's permit.",
+      "fix": "None needed beyond an optional note; the permit is the prerequisite of the named swap.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 50,
+    "depth": 65
+   },
+   {
+    "key": "megaSwap((address fromToken, uint256 fromAmount, uint256 toAmount, uint256 expectedAmount, address beneficiary, (uint256 fromAmountPercent, (address to, uint256 totalNetworkFee, (address adapter, uint256 percent, uint256 networkFee, (uint256 index, address targetExchange, uint256 percent, bytes payload, uint256 networkFee)[] route)[] adapters)[] path)[] path, address partner, uint256 feePercent, bytes permit, uint256 deadline, bytes16 uuid) data)",
+    "effects": [
+     "Takes fromAmount of fromToken from the signer (ETH as msg.value when fromToken is the ETH sentinel).",
+     "Sends at least toAmount (before fees) of the final token data.path[0].path[last].to to beneficiary (the signer when zero).",
+     "Cuts a partner or protocol fee (feePercent, partner, positive slippage) from the output.",
+     "May submit a signer's permit."
+    ],
+    "shown": "\"Swap\" with Amount to Send (fromAmount of fromToken), Receive before fees (toAmount of the last path token) and Beneficiary.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "completeness",
+      "kind": "hidden-value",
+      "title": "megaSwap hides partner and feePercent, which cut the output below the minimum shown.",
+      "evidence": "descriptor megaSwap has no data.feePercent or data.partner field. The label 'Receive before fees' admits a fee of unknown size.",
+      "fix": "Add data.feePercent and data.partner fields.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "megaSwap beneficiary is limited to EOA and zero means the sender.",
+      "evidence": "definitions.beneficiary types ['eoa']. A zero beneficiary defaults to msg.sender.",
+      "fix": "Allow contract types and explain the zero address.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "megaSwap permit bytes are hidden.",
+      "evidence": "data.permit is not displayed.",
+      "fix": "None required.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 50,
+    "depth": 72
+   },
+   {
+    "key": "directUniV3Swap((address fromToken, address toToken, address exchange, uint256 fromAmount, uint256 toAmount, uint256 expectedAmount, uint256 feePercent, uint256 deadline, address partner, bool isApproved, address beneficiary, bytes path, bytes permit, bytes16 uuid) data)",
+    "effects": [
+     "Takes fromAmount of fromToken from the signer (ETH as msg.value when fromToken is the ETH sentinel).",
+     "Swaps it on Uniswap V3 and sends at least toAmount (before fees) of toToken to beneficiary (the signer when zero).",
+     "Cuts a partner or protocol fee from the output.",
+     "May submit a signer's permit."
+    ],
+    "shown": "\"Swap\" with Amount to Send, Receive before fees (toToken) and Beneficiary.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "completeness",
+      "kind": "hidden-value",
+      "title": "directUniV3Swap hides feePercent and partner, which cut the output.",
+      "evidence": "descriptor directUniV3Swap has no data.feePercent or data.partner field. The label is 'Receive before fees'.",
+      "fix": "Add data.feePercent and data.partner fields.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "directUniV3Swap beneficiary is limited to EOA and zero means the sender.",
+      "evidence": "definitions.beneficiary types ['eoa'].",
+      "fix": "Allow contract types and explain the zero address.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "directUniV3Swap permit bytes are hidden.",
+      "evidence": "data.permit is not displayed.",
+      "fix": "None required.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 50,
+    "depth": 72
+   },
+   {
+    "key": "swapOnUniswap(uint256 amountIn, uint256 amountOutMin, address[] path)",
+    "effects": [
+     "Takes amountIn of path[0] from the signer (ETH as msg.value when path[0] is the ETH sentinel).",
+     "Sends at least amountOutMin of path[last] to the signer (unwrapped to ETH when it is the ETH sentinel)."
+    ],
+    "shown": "\"Swap\" with Amount to Send (amountIn of path[0]) and Receive before fees (amountOutMin of path[-1]).",
+    "findings": [
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "swapOnUniswap labels the minimum 'Receive before fees', but this function takes no partner fee.",
+      "evidence": "descriptor swapOnUniswap: amountOutMin uses minReceiveAmount 'Receive before fees'.",
+      "fix": "Use a 'Minimum to Receive' label.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 55,
+    "depth": 85
+   },
+   {
+    "key": "swapOnUniswapFork(address factory, bytes32 initCode, uint256 amountIn, uint256 amountOutMin, address[] path)",
+    "effects": [
+     "Takes amountIn of path[0] from the signer (ETH as msg.value when path[0] is the ETH sentinel).",
+     "Swaps through pairs derived from factory/initCode and sends at least amountOutMin of path[last] to the signer."
+    ],
+    "shown": "\"Swap\" with Amount to Send, Receive before fees (path[-1]) and the Uniswap factory.",
+    "findings": [
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "swapOnUniswapFork labels the minimum 'Receive before fees' with no fee in this path.",
+      "evidence": "descriptor swapOnUniswapFork: amountOutMin uses minReceiveAmount.",
+      "fix": "Use a 'Minimum to Receive' label.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 55,
+    "depth": 82
+   },
+   {
+    "key": "swapOnUniswapV2Fork(address tokenIn, uint256 amountIn, uint256 amountOutMin, address weth, uint256[] pools)",
+    "effects": [
+     "Takes amountIn of tokenIn from the signer (ETH as msg.value when tokenIn is the ETH sentinel).",
+     "Swaps through the packed pools and sends at least amountOutMin of the last pool's output token to the signer.",
+     "When weth is set, the output can be unwrapped to native ETH."
+    ],
+    "shown": "\"Swap\" with Amount to Send (tokenIn), a raw 'Minimum to Receive' number and the last pool as an address.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "swapOnUniswapV2Fork shows the minimum received as a raw integer without its token.",
+      "evidence": "descriptor swapOnUniswapV2Fork: {path: amountOutMin, label: 'Minimum to Receive', format: 'raw'}. The output token comes from the pool's direction bit, not from a calldata address.",
+      "fix": "No tokenPath exists. At least label the unit, or show the weth/output hint; ideally add a token derived from the pools when the spec allows.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "swapOnUniswapV2Fork formats the packed uint256 pool word as an address.",
+      "evidence": "pools.[-1] uses lastPool (addressName), but each pool entry packs the address with direction and fee bits above bit 160.",
+      "fix": "Drop the field, or slice the low 20 bytes when the spec supports it.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "swapOnUniswapV2Fork output asset and ETH unwrap depend on pool state and the hidden weth parameter.",
+      "evidence": "The weth parameter has no field. The output token is read from the pair contract.",
+      "fix": "Show weth as a field to hint at native versus wrapped output.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 45,
+    "depth": 45
+   },
+   {
+    "key": "simpleSwap((address fromToken, address toToken, uint256 fromAmount, uint256 toAmount, uint256 expectedAmount, address[] callees, bytes exchangeData, uint256[] startIndexes, uint256[] values, address beneficiary, address partner, uint256 feePercent, bytes permit, uint256 deadline, bytes16 uuid) data)",
+    "effects": [
+     "Takes fromAmount of fromToken from the signer (ETH as msg.value when fromToken is the ETH sentinel).",
+     "Runs the callees and sends at least toAmount (before fees) of toToken to beneficiary (the signer when zero).",
+     "Cuts a partner or protocol fee (feePercent, partner, positive slippage above expectedAmount) from the output.",
+     "May submit a signer's permit."
+    ],
+    "shown": "\"Swap\" with Amount to Send, Receive before fees (toToken) and Beneficiary.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "completeness",
+      "kind": "hidden-value",
+      "title": "simpleSwap hides feePercent and partner, which cut the output below the minimum shown.",
+      "evidence": "descriptor simpleSwap has no data.feePercent or data.partner field. The label is 'Receive before fees'.",
+      "fix": "Add data.feePercent and data.partner fields.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "simpleSwap beneficiary is limited to EOA and zero means the sender.",
+      "evidence": "definitions.beneficiary types ['eoa'].",
+      "fix": "Allow contract types and explain the zero address.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "simpleSwap permit bytes are hidden.",
+      "evidence": "data.permit is not displayed.",
+      "fix": "None required.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 50,
+    "depth": 72
+   },
+   {
+    "key": "swapOnZeroXv4(address fromToken, address toToken, uint256 fromAmount, uint256 amountOutMin, address exchange, bytes payload)",
+    "effects": [
+     "Takes fromAmount of fromToken from the signer (ETH as msg.value when it is the ETH sentinel).",
+     "Fills the 0x v4 order and sends at least amountOutMin of toToken to the signer."
+    ],
+    "shown": "\"Swap\" with Amount to Send (fromToken), Receive before fees (toToken) and the Exchange.",
+    "findings": [
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "swapOnZeroXv4 labels the minimum 'Receive before fees' though no partner fee applies.",
+      "evidence": "descriptor swapOnZeroXv4: amountOutMin uses minReceiveAmount.",
+      "fix": "Use 'Minimum to Receive'.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 55,
+    "depth": 85
+   },
+   {
+    "key": "swapOnZeroXv2(address fromToken, address toToken, uint256 fromAmount, uint256 amountOutMin, address exchange, bytes payload)",
+    "effects": [
+     "Takes fromAmount of fromToken from the signer (ETH as msg.value when it is the ETH sentinel).",
+     "Fills the 0x v2 order and sends at least amountOutMin of toToken to the signer."
+    ],
+    "shown": "\"Swap\" with Amount to Send (fromToken), Receive before fees (toToken) and the Exchange.",
+    "findings": [
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "swapOnZeroXv2 labels the minimum 'Receive before fees' though no partner fee applies.",
+      "evidence": "descriptor swapOnZeroXv2: amountOutMin uses minReceiveAmount.",
+      "fix": "Use 'Minimum to Receive'.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 55,
+    "depth": 85
+   },
+   {
+    "key": "buyOnUniswap(uint256 amountInMax, uint256 amountOut, address[] path)",
+    "effects": [
+     "Takes up to amountInMax of path[0] from the signer (ETH sent as msg.value, excess refunded).",
+     "Sends exactly amountOut of path[last] to the signer."
+    ],
+    "shown": "\"Buy\" with Maximum to Send (path[0]) and Amount to Receive (path[-1]).",
+    "findings": [],
+    "cases": [],
+    "glance": 55,
+    "depth": 90
+   },
+   {
+    "key": "buyOnUniswapFork(address factory, bytes32 initCode, uint256 amountInMax, uint256 amountOut, address[] path)",
+    "effects": [
+     "Takes up to amountInMax of path[0] from the signer (ETH excess refunded).",
+     "Buys exactly amountOut of path[last] through pairs derived from factory/initCode and sends it to the signer."
+    ],
+    "shown": "\"Buy\" with Maximum to Send, Amount to Receive and the Uniswap factory.",
+    "findings": [],
+    "cases": [],
+    "glance": 55,
+    "depth": 88
+   },
+   {
+    "key": "buyOnUniswapV2Fork(address tokenIn, uint256 amountInMax, uint256 amountOut, address weth, uint256[] pools)",
+    "effects": [
+     "Takes up to amountInMax of tokenIn from the signer (ETH excess refunded).",
+     "Buys exactly amountOut of the last pool's output token for the signer, possibly unwrapped to ETH when weth is set."
+    ],
+    "shown": "\"Buy\" with Maximum to Send (tokenIn), a raw 'Amount to Receive' and the last pool as an address.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "buyOnUniswapV2Fork shows the amount bought as a raw integer without its token.",
+      "evidence": "descriptor buyOnUniswapV2Fork: {path: amountOut, label: 'Amount to Receive', format: 'raw'}.",
+      "fix": "Show the output token when the spec allows deriving it, or show weth as a hint.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "buyOnUniswapV2Fork formats the packed uint256 pool word as an address.",
+      "evidence": "pools.[-1] uses lastPool addressName on a uint256 that packs direction and fee bits.",
+      "fix": "Drop the field or slice the low 20 bytes.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "buyOnUniswapV2Fork output asset depends on pool state and the hidden weth parameter.",
+      "evidence": "There is no weth field, and the output token is read from the pair.",
+      "fix": "Show weth as a field.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 45,
+    "depth": 45
+   },
+   {
+    "key": "buyOnUniswapV2ForkWithPermit(address tokenIn, uint256 amountInMax, uint256 amountOut, address weth, uint256[] pools, bytes permit)",
+    "effects": [
+     "Submits the signer's permit on tokenIn, setting an allowance.",
+     "Takes up to amountInMax of tokenIn from the signer.",
+     "Buys exactly amountOut of the last pool's output token for the signer."
+    ],
+    "shown": "\"Buy\" with Maximum to Send (tokenIn), a raw 'Amount to Receive' and the last pool.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "buyOnUniswapV2ForkWithPermit shows the amount bought raw, without its token.",
+      "evidence": "descriptor: {path: amountOut, label: 'Amount to Receive', format: 'raw'}.",
+      "fix": "Show the output token when possible, or show weth.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "buyOnUniswapV2ForkWithPermit formats the packed pool word as an address.",
+      "evidence": "pools.[-1] uses lastPool addressName on a packed uint256.",
+      "fix": "Drop the field or slice the low 20 bytes.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "buyOnUniswapV2ForkWithPermit hides the permit bytes that set an allowance on tokenIn.",
+      "evidence": "The permit parameter has no field.",
+      "fix": "None required; the permit is the prerequisite of the swap.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 45,
+    "depth": 42
+   },
+   {
+    "key": "multiSwap((address fromToken, uint256 fromAmount, uint256 toAmount, uint256 expectedAmount, address beneficiary, (address to, uint256 totalNetworkFee, (address adapter, uint256 percent, uint256 networkFee, (uint256 index, address targetExchange, uint256 percent, bytes payload, uint256 networkFee)[] route)[] adapters)[] path, address partner, uint256 feePercent, bytes permit, uint256 deadline, bytes16 uuid) data)",
+    "effects": [
+     "Takes fromAmount of fromToken from the signer (ETH as msg.value when fromToken is the ETH sentinel).",
+     "Sends at least toAmount (before fees) of data.path[last].to to beneficiary (the signer when zero).",
+     "Cuts a partner or protocol fee from the output.",
+     "May submit a signer's permit."
+    ],
+    "shown": "\"Swap\" with Amount to Send, Receive before fees (last path token) and Beneficiary.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "completeness",
+      "kind": "hidden-value",
+      "title": "multiSwap hides feePercent and partner, which cut the output.",
+      "evidence": "descriptor multiSwap has no data.feePercent or data.partner field.",
+      "fix": "Add data.feePercent and data.partner fields.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "multiSwap beneficiary is limited to EOA and zero means the sender.",
+      "evidence": "definitions.beneficiary types ['eoa'].",
+      "fix": "Allow contract types and explain the zero address.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "multiSwap permit bytes are hidden.",
+      "evidence": "data.permit is not displayed.",
+      "fix": "None required.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 50,
+    "depth": 72
+   },
+   {
+    "key": "swapOnZeroXv4WithPermit(address fromToken, address toToken, uint256 fromAmount, uint256 amountOutMin, address exchange, bytes payload, bytes permit)",
+    "effects": [
+     "Submits the signer's permit on fromToken, setting an allowance.",
+     "Takes fromAmount of fromToken from the signer.",
+     "Fills the 0x v4 order and sends at least amountOutMin of toToken to the signer."
+    ],
+    "shown": "\"Swap\" with Amount to Send, Receive before fees (toToken) and the Exchange.",
+    "findings": [
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "swapOnZeroXv4WithPermit hides the permit that sets an allowance on fromToken.",
+      "evidence": "The permit parameter has no field.",
+      "fix": "None required; it is the prerequisite of the swap.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "swapOnZeroXv4WithPermit labels the minimum 'Receive before fees' with no partner fee.",
+      "evidence": "amountOutMin uses minReceiveAmount.",
+      "fix": "Use 'Minimum to Receive'.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 55,
+    "depth": 82
+   },
+   {
+    "key": "swapOnUniswapV2ForkWithPermit(address tokenIn, uint256 amountIn, uint256 amountOutMin, address weth, uint256[] pools, bytes permit)",
+    "effects": [
+     "Submits the signer's permit on tokenIn, setting an allowance.",
+     "Takes amountIn of tokenIn from the signer.",
+     "Sends at least amountOutMin of the last pool's output token to the signer, possibly unwrapped to ETH."
+    ],
+    "shown": "\"Swap\" with Amount to Send (tokenIn), a raw 'Minimum to Receive' and the last pool.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "swapOnUniswapV2ForkWithPermit shows the minimum received raw, without its token.",
+      "evidence": "descriptor: {path: amountOutMin, label: 'Minimum to Receive', format: 'raw'}.",
+      "fix": "Show the output token when possible, or show weth.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "raw-value",
+      "title": "swapOnUniswapV2ForkWithPermit formats the packed pool word as an address.",
+      "evidence": "pools.[-1] uses lastPool addressName on a packed uint256.",
+      "fix": "Drop the field or slice the low 20 bytes.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "swapOnUniswapV2ForkWithPermit hides the permit bytes that set an allowance on tokenIn.",
+      "evidence": "The permit parameter has no field.",
+      "fix": "None required.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 45,
+    "depth": 42
+   }
+  ],
+  "couldNotCheck": [
+   "The router implementations behind the AugustusSwapper fallback (selectorVsRouter) are not in contracts/. Only the dispatcher AugustusSwapper.sol is verified here, so every swap effect comes from ParaSwap V5's public router logic, not from the source in this folder.",
+   "Whether each router enforces msg.value == fromAmount for ETH and msg.value == 0 for tokens could not be confirmed from source. The fallback is payable.",
+   "The exact fee logic (cap on feePercent, positive slippage share, and whether the minimum check runs before the fee) could not be confirmed without the router source.",
+   "Which selectors are registered on each chain (1, 56, 137) could not be checked.",
+   "There are no test cases, so no mined transaction or blind-reader result was available."
+  ]
+ },
+ "cost": 0.564,
+ "account": "austingriffith",
+ "seconds": 144,
+ "rubric": "v1.1",
+ "formats": {
+  "simpleBuy((address fromToken, address toToken, uint256 fromAmount, uint256 toAmount, uint256 expectedAmount, address[] callees, bytes exchangeData, uint256[] startIndexes, uint256[] values, address beneficiary, address partner, uint256 feePercent, bytes permit, uint256 deadline, bytes16 uuid) data)": {
+   "grade": "C",
+   "truth": 90,
+   "clarity": 48,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 3,
+   "worst": "simpleBuy hides partner and feePercent, which decide the fee cut from what the beneficiary receives.",
+   "comprehension": null
+  },
+  "megaSwap((address fromToken, uint256 fromAmount, uint256 toAmount, uint256 expectedAmount, address beneficiary, (uint256 fromAmountPercent, (address to, uint256 totalNetworkFee, (address adapter, uint256 percent, uint256 networkFee, (uint256 index, address targetExchange, uint256 percent, bytes payload, uint256 networkFee)[] route)[] adapters)[] path)[] path, address partner, uint256 feePercent, bytes permit, uint256 deadline, bytes16 uuid) data)": {
+   "grade": "C",
+   "truth": 90,
+   "clarity": 56,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 2,
+   "worst": "megaSwap hides partner and feePercent, which cut the output below the minimum shown.",
+   "comprehension": null
+  },
+  "directUniV3Swap((address fromToken, address toToken, address exchange, uint256 fromAmount, uint256 toAmount, uint256 expectedAmount, uint256 feePercent, uint256 deadline, address partner, bool isApproved, address beneficiary, bytes path, bytes permit, bytes16 uuid) data)": {
+   "grade": "C",
+   "truth": 90,
+   "clarity": 56,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 2,
+   "worst": "directUniV3Swap hides feePercent and partner, which cut the output.",
+   "comprehension": null
+  },
+  "swapOnUniswap(uint256 amountIn, uint256 amountOutMin, address[] path)": {
+   "grade": "B",
+   "truth": 100,
+   "clarity": 70,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": null
+  },
+  "swapOnUniswapFork(address factory, bytes32 initCode, uint256 amountIn, uint256 amountOutMin, address[] path)": {
+   "grade": "B",
+   "truth": 100,
+   "clarity": 68,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": null
+  },
+  "swapOnUniswapV2Fork(address tokenIn, uint256 amountIn, uint256 amountOutMin, address weth, uint256[] pools)": {
+   "grade": "C",
+   "truth": 100,
+   "clarity": 35,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 2,
+   "worst": "swapOnUniswapV2Fork shows the minimum received as a raw integer without its token.",
+   "comprehension": null
+  },
+  "simpleSwap((address fromToken, address toToken, uint256 fromAmount, uint256 toAmount, uint256 expectedAmount, address[] callees, bytes exchangeData, uint256[] startIndexes, uint256[] values, address beneficiary, address partner, uint256 feePercent, bytes permit, uint256 deadline, bytes16 uuid) data)": {
+   "grade": "C",
+   "truth": 90,
+   "clarity": 56,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 2,
+   "worst": "simpleSwap hides feePercent and partner, which cut the output below the minimum shown.",
+   "comprehension": null
+  },
+  "swapOnZeroXv4(address fromToken, address toToken, uint256 fromAmount, uint256 amountOutMin, address exchange, bytes payload)": {
+   "grade": "B",
+   "truth": 100,
+   "clarity": 70,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": null
+  },
+  "swapOnZeroXv2(address fromToken, address toToken, uint256 fromAmount, uint256 amountOutMin, address exchange, bytes payload)": {
+   "grade": "B",
+   "truth": 100,
+   "clarity": 70,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": null
+  },
+  "buyOnUniswap(uint256 amountInMax, uint256 amountOut, address[] path)": {
+   "grade": "B",
+   "truth": 100,
+   "clarity": 72,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": null
+  },
+  "buyOnUniswapFork(address factory, bytes32 initCode, uint256 amountInMax, uint256 amountOut, address[] path)": {
+   "grade": "B",
+   "truth": 100,
+   "clarity": 72,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": null
+  },
+  "buyOnUniswapV2Fork(address tokenIn, uint256 amountInMax, uint256 amountOut, address weth, uint256[] pools)": {
+   "grade": "C",
+   "truth": 100,
+   "clarity": 35,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 2,
+   "worst": "buyOnUniswapV2Fork shows the amount bought as a raw integer without its token.",
+   "comprehension": null
+  },
+  "buyOnUniswapV2ForkWithPermit(address tokenIn, uint256 amountInMax, uint256 amountOut, address weth, uint256[] pools, bytes permit)": {
+   "grade": "C",
+   "truth": 100,
+   "clarity": 34,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 2,
+   "worst": "buyOnUniswapV2ForkWithPermit shows the amount bought raw, without its token.",
+   "comprehension": null
+  },
+  "multiSwap((address fromToken, uint256 fromAmount, uint256 toAmount, uint256 expectedAmount, address beneficiary, (address to, uint256 totalNetworkFee, (address adapter, uint256 percent, uint256 networkFee, (uint256 index, address targetExchange, uint256 percent, bytes payload, uint256 networkFee)[] route)[] adapters)[] path, address partner, uint256 feePercent, bytes permit, uint256 deadline, bytes16 uuid) data)": {
+   "grade": "C",
+   "truth": 90,
+   "clarity": 56,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 2,
+   "worst": "multiSwap hides feePercent and partner, which cut the output.",
+   "comprehension": null
+  },
+  "swapOnZeroXv4WithPermit(address fromToken, address toToken, uint256 fromAmount, uint256 amountOutMin, address exchange, bytes payload, bytes permit)": {
+   "grade": "B",
+   "truth": 100,
+   "clarity": 68,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": null
+  },
+  "swapOnUniswapV2ForkWithPermit(address tokenIn, uint256 amountIn, uint256 amountOutMin, address weth, uint256[] pools, bytes permit)": {
+   "grade": "C",
+   "truth": 100,
+   "clarity": 34,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 2,
+   "worst": "swapOnUniswapV2ForkWithPermit shows the minimum received raw, without its token.",
+   "comprehension": null
+  }
+ },
+ "summary": {
+  "grade": "C",
+  "truth": 97,
+  "clarity": 56,
+  "functions": "7B 9C",
+  "incomplete": true,
+  "worst": "simpleBuy hides partner and feePercent, which decide the fee cut from what the beneficiary receives."
+ }
+}

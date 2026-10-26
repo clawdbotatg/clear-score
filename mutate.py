@@ -177,7 +177,7 @@ def report():
         hit = m["grade"] == "F" or (o and o["truth"] - m["truth"] >= 40)
         caught += hit
         total += 1
-        lines.append(f"| {b['mutation']} | `{d['file']}` | {b['format'].split('(')[0]} | "
+        lines.append(f"| {b['mutation']} | `{Path(d['file']).name}` | {b['format'].split('(')[0]} | "
                      f"{o and o['grade'] or '-'} {o and o['truth'] or ''} | {m['grade']} {m['truth']} | {'✅' if hit else '❌'} |")
     lines[1:1] = ["", f"Caught {caught} of {total}."]
     (ROOT / "bench").mkdir(exist_ok=True)

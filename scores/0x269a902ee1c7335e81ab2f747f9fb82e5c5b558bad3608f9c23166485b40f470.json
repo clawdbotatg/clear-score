@@ -1,0 +1,239 @@
+{
+ "hash": "0x269a902ee1c7335e81ab2f747f9fb82e5c5b558bad3608f9c23166485b40f470",
+ "file": "registry/1inch/calldata-AggregationRouterV3.json",
+ "kind": "calldata",
+ "registry": "b70998caa5dab184243a298a0253b5530428b0f2",
+ "deployments": [
+  {
+   "chainId": 1,
+   "address": "0x11111112542d85b3ef69ae05771c2dccff4faa26"
+  },
+  {
+   "chainId": 56,
+   "address": "0x11111112542d85b3ef69ae05771c2dccff4faa26"
+  },
+  {
+   "chainId": 137,
+   "address": "0x11111112542d85b3ef69ae05771c2dccff4faa26"
+  }
+ ],
+ "auditedBy": [
+  "0x3846c3a30e62075fa916216b35ef04b8f53931f6"
+ ],
+ "model": "claude-opus-5-5 (high)",
+ "reader": "claude-sonnet-5-5",
+ "prompt": "7bcbb754c1e7",
+ "date": "2026-10-26T15:00Z",
+ "answer": {
+  "formats": [
+   {
+    "key": "swap(address caller, (address srcToken, address dstToken, address srcReceiver, address dstReceiver, uint256 amount, uint256 minReturnAmount, uint256 flags, bytes permit) desc, bytes data)",
+    "effects": [
+     "The signer sends desc.amount of desc.srcToken. For ETH this goes in as msg.value. For a token with the SHOULD_CLAIM flag, safeTransferFrom moves it from the signer to desc.srcReceiver.",
+     "With the REQUIRES_EXTRA_ETH flag (0x02), msg.value can be larger than desc.amount, or above zero for an ERC-20 source. All of msg.value is forwarded to the executor `caller`.",
+     "The signer's desc.permit signature is submitted to srcToken.permit, which grants the router an allowance.",
+     "desc.dstReceiver receives at least desc.minReturnAmount of desc.dstToken. If dstReceiver is the zero address, the signer (msg.sender) receives it.",
+     "With the PARTIAL_FILL flag, less than desc.amount may be spent. Then the minimum becomes a ratio: returnAmount*amount >= minReturnAmount*spent.",
+     "Arbitrary executor code (`data`) runs with the funds. Only the output check protects the signer."
+    ],
+    "shown": "\"Swap\", plus Amount to Send (desc.amount in srcToken), Minimum to Receive (minReturnAmount in dstToken) and Beneficiary (dstReceiver). msg.value, flags, srcReceiver, permit and data are not shown.",
+    "findings": [
+     {
+      "severity": "critical",
+      "axis": "completeness",
+      "kind": "hidden-value",
+      "title": "swap is payable and has no @.value field; with REQUIRES_EXTRA_ETH, ETH beyond the shown amount leaves",
+      "evidence": "AggregationRouterV3.sol swap(): `if (flags & _REQUIRES_EXTRA_ETH != 0) { require(msg.value > (srcToken.isETH() ? desc.amount : 0)...` and `address(caller).call{value: msg.value}(...)`. The descriptor has no `@.value` field and has `desc.flags` set to visible: never.",
+      "fix": "Add an `@.value` field with format amount, labelled 'ETH sent (incl. extra)'.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "swap shows Beneficiary 0x000…0 when dstReceiver is zero, but the code pays the signer",
+      "evidence": "swap(): `address dstReceiver = (desc.dstReceiver == address(0)) ? msg.sender : desc.dstReceiver;`. The descriptor shows `desc.dstReceiver` with plain addressName.",
+      "fix": "Use a sender-address param, or a label or threshold that shows the zero address as 'You (sender)'.",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "truth",
+      "kind": "wrong-amount",
+      "title": "swap: with PARTIAL_FILL, 'Minimum to Receive' is a rate, not an absolute minimum",
+      "evidence": "swap(): `if (flags & _PARTIAL_FILL != 0) { spentAmount = ...; require(returnAmount.mul(desc.amount) >= desc.minReturnAmount.mul(spentAmount)` while desc.flags is visible: never.",
+      "fix": "Show desc.flags, or label the amounts 'Max to send' and 'Min to receive (pro-rata if partially filled)'.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "swap: executor data, srcReceiver and permit are hidden; only the minimum-output check protects the signer",
+      "evidence": "Fields `data`, `desc.srcReceiver` and `desc.permit` are visible: never. swap() runs `caller.callBytes(data)`; with SHOULD_CLAIM, `srcToken.safeTransferFrom(msg.sender, desc.srcReceiver, desc.amount)`.",
+      "fix": "No descriptor fix can decode the executor bytes. The output token, minimum and receiver are shown.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "under-simplified",
+      "title": "swap intent is only 'Swap', with no interpolatedIntent naming the amounts",
+      "evidence": "descriptor swap format: `\"intent\": \"Swap\"`, no interpolatedIntent",
+      "fix": "Add interpolatedIntent 'Swap {desc.amount} for at least {desc.minReturnAmount} to {desc.dstReceiver}'.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 0,
+      "signerEffects": 1,
+      "shownRight": 1,
+      "reader": [
+       "right"
+      ],
+      "notes": "The mined tx reverted (status 0). The trace shows 0.04 ETH out, which matches Amount to Send. Nothing arrived."
+     }
+    ],
+    "glance": 40,
+    "depth": 60
+   },
+   {
+    "key": "unoswap(address srcToken, uint256 amount, uint256 minReturn, bytes32[] pools)",
+    "effects": [
+     "The signer sends `amount` of srcToken. If srcToken is 0, that is ETH with msg.value == amount, wrapped to WETH and sent to the first pool. Otherwise transferFrom moves it from the signer to the first pool.",
+     "The signer (caller) receives at least minReturn of the output token. The last pool pair and its reverse bit decide that token. If the WETH flag is set on the last pool, WETH is unwrapped and paid as ETH.",
+     "msg.value must be 0 for token sources, so no extra native value can leave."
+    ],
+    "shown": "\"Swap\", plus Amount to Send (amount in srcToken, ETH when 0), Minimum to Receive (a raw integer with no token) and Beneficiary (the sender). Pools are hidden.",
+    "findings": [
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "spec-limitation",
+      "title": "unoswap Minimum to Receive is a raw integer; the output token comes only from packed pool data",
+      "evidence": "Case 1: the screen shows 'Minimum to Receive: 4957007923890945718204719' while the signer received 390472947688183179397132477 AKITA (0x3301…23e6). The descriptor minReturn field has no tokenPath. unoswap() picks the output from `and(rawPair, _REVERSE_MASK)` of the last pool and `_WETH_MASK`.",
+      "fix": "No calldata path gives the output token. Consider showing the last pool so the signer can check the pair.",
+      "groundTruth": true
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "under-simplified",
+      "title": "unoswap hides pools entirely, while its sibling unoswapWithPermit shows the last pool",
+      "evidence": "unoswap format: `{\"label\": \"Pools\", \"path\": \"pools\", \"visible\": \"never\"}`. unoswapWithPermit shows `pools.[-1]` with $.display.definitions.lastPool.",
+      "fix": "Add `pools.[-1]` with the lastPool definition, as in unoswapWithPermit.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "test-gap",
+      "title": "unoswap case 1 renders from a test sender that differs from the mined signer, so Beneficiary looks foreign",
+      "evidence": "cases/1.json: `from` 0x7E5F…5Bdf, but mined.signer is 0xf3c0…1ac4. The reader concluded 'the output tokens go to someone else'.",
+      "fix": "Render test cases with the mined signer as @.from.",
+      "groundTruth": true
+     }
+    ],
+    "cases": [
+     {
+      "index": 1,
+      "signerEffects": 2,
+      "shownRight": 1,
+      "reader": [
+       "right",
+       "wrong"
+      ],
+      "notes": "The reader got 0.00414225 ETH out right. AKITA in: the screen gives a raw minimum with no token, and the test's from-address mismatch made the reader think another address receives it."
+     }
+    ],
+    "glance": 40,
+    "depth": 45
+   },
+   {
+    "key": "unoswapWithPermit(address srcToken, uint256 amount, uint256 minReturn, bytes32[] pools, bytes permit)",
+    "effects": [
+     "The signer's permit signature is submitted to srcToken.permit, which grants the router an allowance for the swap.",
+     "The signer sends `amount` of srcToken to the first pool (or ETH, wrapped, when srcToken is 0).",
+     "The signer receives at least minReturn of the output token that the last pool decides. ETH is paid when the WETH flag is set."
+    ],
+    "shown": "\"Swap\", plus Amount to Send (amount in srcToken), Minimum to Receive (raw, no token), Beneficiary (the sender) and Last pool. The permit is hidden.",
+    "findings": [
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "spec-limitation",
+      "title": "unoswapWithPermit Minimum to Receive has no token; the output token is packed in the pool words",
+      "evidence": "Descriptor minReturn field has no tokenPath. UnoswapRouter.unoswap() decides the output from the last pool's `_REVERSE_MASK` and `_WETH_MASK` bits.",
+      "fix": "None with current paths. Last pool is shown as a hint.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "other",
+      "title": "unoswapWithPermit hides the permit that grants the router an allowance",
+      "evidence": "Permitable._permit(): `address(token).call(abi.encodePacked(IERC20Permit.permit.selector, permit))`. The descriptor has `permit` as visible: never.",
+      "fix": "Optional: note in the intent that a permit for the router is used. This is the prerequisite of the named swap.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 40,
+    "depth": 50
+   }
+  ],
+  "couldNotCheck": [
+   "How wallets render `pools.[-1]` (a bytes32 with reverse, WETH and numerator bits in the high bytes) with addressName in unoswapWithPermit; the shown pool address may be wrong.",
+   "Case 0 (swap) reverted on chain (status 0), so its traced ETH movement was rolled back. Only the outgoing value could be compared.",
+   "Did not confirm that the BSC and Polygon deployments use different _WETH constants in UnoswapRouter. This does not affect the descriptor fields."
+  ]
+ },
+ "cost": 0.612,
+ "account": "clawd_buidlguidl",
+ "seconds": 111,
+ "rubric": "v1.1",
+ "formats": {
+  "swap(address caller, (address srcToken, address dstToken, address srcReceiver, address dstReceiver, uint256 amount, uint256 minReturnAmount, uint256 flags, bytes permit) desc, bytes data)": {
+   "grade": "F",
+   "truth": 25,
+   "clarity": 75,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 1,
+   "warnings": 2,
+   "worst": "swap is payable and has no @.value field; with REQUIRES_EXTRA_ETH, ETH beyond the shown amount leaves",
+   "comprehension": 100
+  },
+  "unoswap(address srcToken, uint256 amount, uint256 minReturn, bytes32[] pools)": {
+   "grade": "C",
+   "truth": 100,
+   "clarity": 27,
+   "measured": true,
+   "groundTruth": true,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "unoswap hides pools entirely, while its sibling unoswapWithPermit shows the last pool",
+   "comprehension": 25
+  },
+  "unoswapWithPermit(address srcToken, uint256 amount, uint256 minReturn, bytes32[] pools, bytes permit)": {
+   "grade": "C",
+   "truth": 100,
+   "clarity": 45,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": null
+  }
+ },
+ "summary": {
+  "grade": "F",
+  "truth": 75,
+  "clarity": 49,
+  "functions": "2C 1F",
+  "incomplete": true,
+  "worst": "swap is payable and has no @.value field; with REQUIRES_EXTRA_ETH, ETH beyond the shown amount leaves"
+ }
+}

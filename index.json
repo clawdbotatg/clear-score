@@ -1,10 +1,328 @@
 {
 "functions": {
+"10:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0x07f464a4": {
+"clarity": 37,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "C",
+"truth": 100
+},
+"10:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0x68cb3d94": {
+"clarity": 25,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "F",
+"truth": 25
+},
+"10:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0xed007fc6": {
+"clarity": 30,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "F",
+"truth": 25
+},
+"10:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0xf6682ab0": {
+"clarity": 45,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "C",
+"truth": 100
+},
+"11155111:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0x07f464a4": {
+"clarity": 37,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "C",
+"truth": 100
+},
+"11155111:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0x68cb3d94": {
+"clarity": 25,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "F",
+"truth": 25
+},
+"11155111:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0xed007fc6": {
+"clarity": 30,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "F",
+"truth": 25
+},
+"11155111:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0xf6682ab0": {
+"clarity": 45,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "C",
+"truth": 100
+},
+"11155111:0xb5679de944a79732a75ce556191df11f489448d5:0x6abe3a6c": {
+"clarity": 48,
+"file": "registry/threshold/calldata-TBTCVault.json",
+"grade": "C",
+"truth": 100
+},
+"11155111:0xb5679de944a79732a75ce556191df11f489448d5:0x820b5513": {
+"clarity": 62,
+"file": "registry/threshold/calldata-TBTCVault.json",
+"grade": "B",
+"truth": 100
+},
+"137:0x11111112542d85b3ef69ae05771c2dccff4faa26:0x2e95b6c8": {
+"clarity": 27,
+"file": "registry/1inch/calldata-AggregationRouterV3.json",
+"grade": "C",
+"truth": 100
+},
+"137:0x11111112542d85b3ef69ae05771c2dccff4faa26:0x7c025200": {
+"clarity": 75,
+"file": "registry/1inch/calldata-AggregationRouterV3.json",
+"grade": "F",
+"truth": 25
+},
+"137:0x11111112542d85b3ef69ae05771c2dccff4faa26:0xa1251d75": {
+"clarity": 45,
+"file": "registry/1inch/calldata-AggregationRouterV3.json",
+"grade": "C",
+"truth": 100
+},
+"137:0x1111111254fb6c44bac0bed2854e76f90643097d:0x2521b930": {
+"clarity": 22,
+"file": "registry/1inch/calldata-AggregationRouterV4.json",
+"grade": "C",
+"truth": 90
+},
+"137:0x1111111254fb6c44bac0bed2854e76f90643097d:0x2e95b6c8": {
+"clarity": 30,
+"file": "registry/1inch/calldata-AggregationRouterV4.json",
+"grade": "C",
+"truth": 100
+},
+"137:0x1111111254fb6c44bac0bed2854e76f90643097d:0x7c025200": {
+"clarity": 39,
+"file": "registry/1inch/calldata-AggregationRouterV4.json",
+"grade": "F",
+"truth": 25
+},
+"137:0x1111111254fb6c44bac0bed2854e76f90643097d:0xa1251d75": {
+"clarity": 30,
+"file": "registry/1inch/calldata-AggregationRouterV4.json",
+"grade": "C",
+"truth": 100
+},
+"137:0x1111111254fb6c44bac0bed2854e76f90643097d:0xbc80f1a8": {
+"clarity": 20,
+"file": "registry/1inch/calldata-AggregationRouterV4.json",
+"grade": "C",
+"truth": 100
+},
+"137:0x1111111254fb6c44bac0bed2854e76f90643097d:0xe449022e": {
+"clarity": 18,
+"file": "registry/1inch/calldata-AggregationRouterV4.json",
+"grade": "C",
+"truth": 100
+},
+"137:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0x07f464a4": {
+"clarity": 37,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "C",
+"truth": 100
+},
+"137:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0x68cb3d94": {
+"clarity": 25,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "F",
+"truth": 25
+},
+"137:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0xed007fc6": {
+"clarity": 30,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "F",
+"truth": 25
+},
+"137:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0xf6682ab0": {
+"clarity": 45,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "C",
+"truth": 100
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x0b86a4c1": {
+"clarity": 35,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 100
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x2298207a": {
+"clarity": 48,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x2941a712": {
+"clarity": 34,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 100
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x46c67b6d": {
+"clarity": 56,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x54840d1a": {
+"clarity": 70,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x54e3f31b": {
+"clarity": 56,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x64466805": {
+"clarity": 70,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x6b4109d3": {
+"clarity": 68,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x6e91538b": {
+"clarity": 34,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 100
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x81033120": {
+"clarity": 70,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x935fb84b": {
+"clarity": 72,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xa6886da9": {
+"clarity": 56,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xa94e78ef": {
+"clarity": 56,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xb2f1e6db": {
+"clarity": 35,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 100
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xc03786b0": {
+"clarity": 72,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"137:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xf5661034": {
+"clarity": 68,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"1:0x00000000219ab540356cbb839cbe05303d7705fa:0x22895118": {
+"clarity": 92,
+"file": "registry/consensus-specs/calldata-DepositContract.json",
+"grade": "A",
+"truth": 100
+},
 "1:0x004c226fff73aa94b78a4df1a0e861797ba16819:0x254209ba": {
 "clarity": 90,
 "file": "registry/kiln/calldata-kiln-batch-exit.json",
 "grade": "A",
 "truth": 100
+},
+"1:0x11111112542d85b3ef69ae05771c2dccff4faa26:0x2e95b6c8": {
+"clarity": 27,
+"file": "registry/1inch/calldata-AggregationRouterV3.json",
+"grade": "C",
+"truth": 100
+},
+"1:0x11111112542d85b3ef69ae05771c2dccff4faa26:0x7c025200": {
+"clarity": 75,
+"file": "registry/1inch/calldata-AggregationRouterV3.json",
+"grade": "F",
+"truth": 25
+},
+"1:0x11111112542d85b3ef69ae05771c2dccff4faa26:0xa1251d75": {
+"clarity": 45,
+"file": "registry/1inch/calldata-AggregationRouterV3.json",
+"grade": "C",
+"truth": 100
+},
+"1:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0x07f464a4": {
+"clarity": 37,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "C",
+"truth": 100
+},
+"1:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0x68cb3d94": {
+"clarity": 25,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "F",
+"truth": 25
+},
+"1:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0xed007fc6": {
+"clarity": 30,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "F",
+"truth": 25
+},
+"1:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0xf6682ab0": {
+"clarity": 45,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "C",
+"truth": 100
+},
+"1:0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45:0x04e45aaf": {
+"clarity": 75,
+"file": "registry/uniswap/calldata-UniswapV3Router02.json",
+"grade": "F",
+"truth": 25
+},
+"1:0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45:0x09b81346": {
+"clarity": 81,
+"file": "registry/uniswap/calldata-UniswapV3Router02.json",
+"grade": "F",
+"truth": 25
+},
+"1:0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45:0x42712a67": {
+"clarity": 60,
+"file": "registry/uniswap/calldata-UniswapV3Router02.json",
+"grade": "F",
+"truth": 25
+},
+"1:0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45:0x472b43f3": {
+"clarity": 54,
+"file": "registry/uniswap/calldata-UniswapV3Router02.json",
+"grade": "F",
+"truth": 25
+},
+"1:0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45:0x5023b4df": {
+"clarity": 80,
+"file": "registry/uniswap/calldata-UniswapV3Router02.json",
+"grade": "F",
+"truth": 25
+},
+"1:0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45:0xb858183f": {
+"clarity": 75,
+"file": "registry/uniswap/calldata-UniswapV3Router02.json",
+"grade": "F",
+"truth": 25
 },
 "1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0x02751cec": {
 "clarity": 94,
@@ -108,10 +426,364 @@
 "grade": "A",
 "truth": 100
 },
+"1:0x9c070027cdc9dc8f82416b2e5314e11dfb4fe3cd:0x6abe3a6c": {
+"clarity": 48,
+"file": "registry/threshold/calldata-TBTCVault.json",
+"grade": "C",
+"truth": 100
+},
+"1:0x9c070027cdc9dc8f82416b2e5314e11dfb4fe3cd:0x820b5513": {
+"clarity": 62,
+"file": "registry/threshold/calldata-TBTCVault.json",
+"grade": "B",
+"truth": 100
+},
+"1:0x9d39a5de30e57443bff2a8307a4256c8797a3497:0x9343d9e1": {
+"clarity": 75,
+"file": "registry/ethena/calldata-ethena.json",
+"grade": "F",
+"truth": 25
+},
+"1:0x9d39a5de30e57443bff2a8307a4256c8797a3497:0xcdac52ed": {
+"clarity": 37,
+"file": "registry/ethena/calldata-ethena.json",
+"grade": "F",
+"truth": 25
+},
+"1:0x9d39a5de30e57443bff2a8307a4256c8797a3497:0xf2888dbb": {
+"clarity": 34,
+"file": "registry/ethena/calldata-ethena.json",
+"grade": "C",
+"truth": 100
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x0b86a4c1": {
+"clarity": 35,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 100
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x2298207a": {
+"clarity": 48,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x2941a712": {
+"clarity": 34,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 100
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x46c67b6d": {
+"clarity": 56,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x54840d1a": {
+"clarity": 70,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x54e3f31b": {
+"clarity": 56,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x64466805": {
+"clarity": 70,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x6b4109d3": {
+"clarity": 68,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x6e91538b": {
+"clarity": 34,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 100
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x81033120": {
+"clarity": 70,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x935fb84b": {
+"clarity": 72,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xa6886da9": {
+"clarity": 56,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xa94e78ef": {
+"clarity": 56,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xb2f1e6db": {
+"clarity": 35,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 100
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xc03786b0": {
+"clarity": 72,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"1:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xf5661034": {
+"clarity": 68,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"42161:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0x07f464a4": {
+"clarity": 37,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "C",
+"truth": 100
+},
+"42161:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0x68cb3d94": {
+"clarity": 25,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "F",
+"truth": 25
+},
+"42161:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0xed007fc6": {
+"clarity": 30,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "F",
+"truth": 25
+},
+"42161:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0xf6682ab0": {
+"clarity": 45,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "C",
+"truth": 100
+},
+"560048:0x00000000219ab540356cbb839cbe05303d7705fa:0x22895118": {
+"clarity": 92,
+"file": "registry/consensus-specs/calldata-DepositContract.json",
+"grade": "A",
+"truth": 100
+},
 "560048:0x06f9c32a3093dde837a2e172041df79b4b850a2e:0x254209ba": {
 "clarity": 90,
 "file": "registry/kiln/calldata-kiln-batch-exit.json",
 "grade": "A",
+"truth": 100
+},
+"56:0x11111112542d85b3ef69ae05771c2dccff4faa26:0x2e95b6c8": {
+"clarity": 27,
+"file": "registry/1inch/calldata-AggregationRouterV3.json",
+"grade": "C",
+"truth": 100
+},
+"56:0x11111112542d85b3ef69ae05771c2dccff4faa26:0x7c025200": {
+"clarity": 75,
+"file": "registry/1inch/calldata-AggregationRouterV3.json",
+"grade": "F",
+"truth": 25
+},
+"56:0x11111112542d85b3ef69ae05771c2dccff4faa26:0xa1251d75": {
+"clarity": 45,
+"file": "registry/1inch/calldata-AggregationRouterV3.json",
+"grade": "C",
+"truth": 100
+},
+"56:0x1111111254fb6c44bac0bed2854e76f90643097d:0x2521b930": {
+"clarity": 22,
+"file": "registry/1inch/calldata-AggregationRouterV4.json",
+"grade": "C",
+"truth": 90
+},
+"56:0x1111111254fb6c44bac0bed2854e76f90643097d:0x2e95b6c8": {
+"clarity": 30,
+"file": "registry/1inch/calldata-AggregationRouterV4.json",
+"grade": "C",
+"truth": 100
+},
+"56:0x1111111254fb6c44bac0bed2854e76f90643097d:0x7c025200": {
+"clarity": 39,
+"file": "registry/1inch/calldata-AggregationRouterV4.json",
+"grade": "F",
+"truth": 25
+},
+"56:0x1111111254fb6c44bac0bed2854e76f90643097d:0xa1251d75": {
+"clarity": 30,
+"file": "registry/1inch/calldata-AggregationRouterV4.json",
+"grade": "C",
+"truth": 100
+},
+"56:0x1111111254fb6c44bac0bed2854e76f90643097d:0xbc80f1a8": {
+"clarity": 20,
+"file": "registry/1inch/calldata-AggregationRouterV4.json",
+"grade": "C",
+"truth": 100
+},
+"56:0x1111111254fb6c44bac0bed2854e76f90643097d:0xe449022e": {
+"clarity": 18,
+"file": "registry/1inch/calldata-AggregationRouterV4.json",
+"grade": "C",
+"truth": 100
+},
+"56:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0x07f464a4": {
+"clarity": 37,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "C",
+"truth": 100
+},
+"56:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0x68cb3d94": {
+"clarity": 25,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "F",
+"truth": 25
+},
+"56:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0xed007fc6": {
+"clarity": 30,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "F",
+"truth": 25
+},
+"56:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0xf6682ab0": {
+"clarity": 45,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "C",
+"truth": 100
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x0b86a4c1": {
+"clarity": 35,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 100
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x2298207a": {
+"clarity": 48,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x2941a712": {
+"clarity": 34,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 100
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x46c67b6d": {
+"clarity": 56,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x54840d1a": {
+"clarity": 70,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x54e3f31b": {
+"clarity": 56,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x64466805": {
+"clarity": 70,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x6b4109d3": {
+"clarity": 68,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x6e91538b": {
+"clarity": 34,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 100
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x81033120": {
+"clarity": 70,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0x935fb84b": {
+"clarity": 72,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xa6886da9": {
+"clarity": 56,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xa94e78ef": {
+"clarity": 56,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 90
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xb2f1e6db": {
+"clarity": 35,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "C",
+"truth": 100
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xc03786b0": {
+"clarity": 72,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"56:0xdef171fe48cf0115b1d80b88dc8eab59176fee57:0xf5661034": {
+"clarity": 68,
+"file": "registry/paraswap/calldata-AugustusSwapper-v5.json",
+"grade": "B",
+"truth": 100
+},
+"8453:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0x07f464a4": {
+"clarity": 37,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "C",
+"truth": 100
+},
+"8453:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0x68cb3d94": {
+"clarity": 25,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "F",
+"truth": 25
+},
+"8453:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0xed007fc6": {
+"clarity": 30,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "F",
+"truth": 25
+},
+"8453:0x526643f69b81b008f46d95cd5ced5ec0edffdac6:0xf6682ab0": {
+"clarity": 45,
+"file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+"grade": "C",
 "truth": 100
 }
 },

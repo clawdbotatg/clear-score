@@ -1,0 +1,237 @@
+{
+ "hash": "0x4cae1cf08110038ba8a127e4675aa7454c99fa6a6fd75443b695e1afd64e94c7",
+ "file": "registry/safe/calldata-SafeMigration-1.4.1.json",
+ "kind": "calldata",
+ "registry": "b70998caa5dab184243a298a0253b5530428b0f2",
+ "deployments": [
+  {
+   "chainId": 1,
+   "address": "0x526643f69b81b008f46d95cd5ced5ec0edffdac6"
+  },
+  {
+   "chainId": 10,
+   "address": "0x526643f69b81b008f46d95cd5ced5ec0edffdac6"
+  },
+  {
+   "chainId": 56,
+   "address": "0x526643f69b81b008f46d95cd5ced5ec0edffdac6"
+  },
+  {
+   "chainId": 137,
+   "address": "0x526643f69b81b008f46d95cd5ced5ec0edffdac6"
+  },
+  {
+   "chainId": 8453,
+   "address": "0x526643f69b81b008f46d95cd5ced5ec0edffdac6"
+  },
+  {
+   "chainId": 42161,
+   "address": "0x526643f69b81b008f46d95cd5ced5ec0edffdac6"
+  },
+  {
+   "chainId": 11155111,
+   "address": "0x526643f69b81b008f46d95cd5ced5ec0edffdac6"
+  }
+ ],
+ "auditedBy": [
+  "0x3846c3a30e62075fa916216b35ef04b8f53931f6"
+ ],
+ "model": "claude-opus-5-5 (high)",
+ "reader": "claude-sonnet-5-5",
+ "prompt": "7bcbb754c1e7",
+ "date": "2026-10-26T15:00Z",
+ "answer": {
+  "formats": [
+   {
+    "key": "migrateSingleton()",
+    "effects": [
+     "Run by delegatecall from the Safe, it overwrites the Safe proxy's singleton (storage slot 0) with the fixed SAFE_SINGLETON, 0x41675C09…461a (Safe v1.4.1 on mainnet). From then on that code controls the Safe.",
+     "It emits ChangedMasterCopy(SAFE_SINGLETON).",
+     "It moves no tokens or ETH, sets no approvals and is not payable."
+    ],
+    "shown": "\"Migrate Safe\" and the migration contract address. Nothing says the Safe's implementation is replaced, or by which version or address.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "over-simplified",
+      "title": "migrateSingleton intent \"Migrate Safe\" does not say the Safe's code is replaced, or with which version.",
+      "evidence": "SafeMigration.sol migrateSingleton(): `singleton = SAFE_SINGLETON;`. Descriptor: \"intent\": \"Migrate Safe\". The only field is `@.to` 'Migration contract'. The target is fixed per deployment: constructor arg safeSingleton 0x41675C099F32341bf84BFc5382aF534df5C7461a, contract name SafeMigration-1.4.1.",
+      "fix": "Use an intent like \"Upgrade Safe implementation to v1.4.1\" and label the field \"Migration contract (v1.4.1)\".",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "migrateSingleton: the new singleton address is an immutable, not calldata, so no field can show it.",
+      "evidence": "SafeMigration.sol: `address public immutable SAFE_SINGLETON;`, set in the constructor. The function has no parameters.",
+      "fix": "Name the target version in the intent or label, since the address cannot be read from calldata.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 55,
+    "depth": 45
+   },
+   {
+    "key": "migrateWithFallbackHandler()",
+    "effects": [
+     "Run by delegatecall from the Safe, it overwrites the Safe's singleton with the fixed SAFE_SINGLETON (Safe v1.4.1). Its events say ChangedMasterCopy.",
+     "It calls the Safe's own setFallbackHandler with the fixed SAFE_FALLBACK_HANDLER (0xfd0732Dc…Ec99). This replaces whatever fallback handler the Safe had, which changes how the Safe answers unknown calls such as EIP-1271 signature checks and token callbacks.",
+     "It moves no tokens or ETH, sets no approvals and is not payable."
+    ],
+    "shown": "\"Migrate Safe\" and the migration contract address. This is the same screen as migrateSingleton, and nothing mentions the fallback handler being replaced.",
+    "findings": [
+     {
+      "severity": "critical",
+      "axis": "completeness",
+      "kind": "hidden-effect",
+      "title": "migrateWithFallbackHandler replaces the Safe's fallback handler, but its screen is the same as migrateSingleton's.",
+      "evidence": "SafeMigration.sol migrateWithFallbackHandler(): `migrateSingleton(); ISafe(address(this)).setFallbackHandler(SAFE_FALLBACK_HANDLER);`. Descriptor: \"intent\": \"Migrate Safe\", exactly as in migrateSingleton(). The only field is `@.to`. Any existing handler, for example a custom one with signature or domain verifiers, is overwritten without notice.",
+      "fix": "Use an intent like \"Upgrade Safe to v1.4.1 and replace fallback handler\".",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "migrateWithFallbackHandler: the new singleton and fallback handler addresses are immutables, not calldata.",
+      "evidence": "SafeMigration.sol: `SAFE_SINGLETON` and `SAFE_FALLBACK_HANDLER` are immutable constructor values. The function has no parameters.",
+      "fix": "Name the version and the handler change in the intent.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 30,
+    "depth": 30
+   },
+   {
+    "key": "migrateL2Singleton()",
+    "effects": [
+     "Run by delegatecall from the Safe, it overwrites the Safe's singleton with the fixed SAFE_L2_SINGLETON, 0x29fcB43b…C762 (SafeL2 v1.4.1). This happens on any chain, mainnet included.",
+     "It emits ChangedMasterCopy(SAFE_L2_SINGLETON).",
+     "It moves no tokens or ETH, sets no approvals and is not payable."
+    ],
+    "shown": "\"Migrate Safe L2\" and the migration contract address. Nothing says the implementation is replaced by the SafeL2 v1.4.1 singleton.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "migrateL2Singleton intent \"Migrate Safe L2\" reads as migrating an L2 Safe, not switching to the L2 singleton.",
+      "evidence": "SafeMigration.sol migrateL2Singleton(): `singleton = SAFE_L2_SINGLETON;`. Descriptor: \"intent\": \"Migrate Safe L2\". It works the same on every chain, and the version is not named.",
+      "fix": "Use an intent like \"Upgrade Safe implementation to SafeL2 v1.4.1\".",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "migrateL2Singleton: the new singleton address is an immutable, not calldata, so no field can show it.",
+      "evidence": "SafeMigration.sol: `address public immutable SAFE_L2_SINGLETON;`, set in the constructor.",
+      "fix": "Name the target in the intent or label.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 45,
+    "depth": 40
+   },
+   {
+    "key": "migrateL2WithFallbackHandler()",
+    "effects": [
+     "Run by delegatecall from the Safe, it overwrites the Safe's singleton with the fixed SAFE_L2_SINGLETON (SafeL2 v1.4.1). Its events say ChangedMasterCopy.",
+     "It calls the Safe's own setFallbackHandler with the fixed SAFE_FALLBACK_HANDLER (0xfd0732Dc…Ec99), replacing the existing fallback handler.",
+     "It moves no tokens or ETH, sets no approvals and is not payable."
+    ],
+    "shown": "\"Migrate Safe L2\" and the migration contract address. This is the same screen as migrateL2Singleton, and nothing mentions the fallback handler being replaced.",
+    "findings": [
+     {
+      "severity": "critical",
+      "axis": "completeness",
+      "kind": "hidden-effect",
+      "title": "migrateL2WithFallbackHandler replaces the Safe's fallback handler, but its screen is the same as migrateL2Singleton's.",
+      "evidence": "SafeMigration.sol migrateL2WithFallbackHandler(): `migrateL2Singleton(); ISafe(address(this)).setFallbackHandler(SAFE_FALLBACK_HANDLER);`. Descriptor: \"intent\": \"Migrate Safe L2\", exactly as in migrateL2Singleton(). The only field is `@.to`.",
+      "fix": "Use an intent like \"Upgrade Safe to SafeL2 v1.4.1 and replace fallback handler\".",
+      "groundTruth": false
+     },
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "misleading-label",
+      "title": "migrateL2WithFallbackHandler intent \"Migrate Safe L2\" does not name the L2 singleton or the version.",
+      "evidence": "Descriptor: \"intent\": \"Migrate Safe L2\". Code: `singleton = SAFE_L2_SINGLETON` (0x29fcB43b46531BcA003ddC8FCB67FFE91900C762).",
+      "fix": "Name SafeL2 v1.4.1 in the intent.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 30,
+    "depth": 30
+   }
+  ],
+  "couldNotCheck": [
+   "The source was verified only for chain 1. I assumed the immutables (singleton, L2 singleton, fallback handler) are the same on the other six chains, since the address is the same, but I did not check them.",
+   "No test cases exist, so nothing could be compared with mined transactions."
+  ]
+ },
+ "cost": 0.262,
+ "account": "slop_buidlguidl",
+ "seconds": 69,
+ "rubric": "v1.1",
+ "formats": {
+  "migrateSingleton()": {
+   "grade": "C",
+   "truth": 100,
+   "clarity": 45,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "migrateSingleton intent \"Migrate Safe\" does not say the Safe's code is replaced, or with which version.",
+   "comprehension": null
+  },
+  "migrateWithFallbackHandler()": {
+   "grade": "F",
+   "truth": 25,
+   "clarity": 30,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 1,
+   "warnings": 0,
+   "worst": "migrateWithFallbackHandler replaces the Safe's fallback handler, but its screen is the same as migrateSingleton's.",
+   "comprehension": null
+  },
+  "migrateL2Singleton()": {
+   "grade": "C",
+   "truth": 100,
+   "clarity": 37,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "migrateL2Singleton intent \"Migrate Safe L2\" reads as migrating an L2 Safe, not switching to the L2 singleton.",
+   "comprehension": null
+  },
+  "migrateL2WithFallbackHandler()": {
+   "grade": "F",
+   "truth": 25,
+   "clarity": 25,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 1,
+   "warnings": 1,
+   "worst": "migrateL2WithFallbackHandler replaces the Safe's fallback handler, but its screen is the same as migrateL2Singleton's.",
+   "comprehension": null
+  }
+ },
+ "summary": {
+  "grade": "F",
+  "truth": 62,
+  "clarity": 34,
+  "functions": "2C 2F",
+  "incomplete": true,
+  "worst": "migrateWithFallbackHandler replaces the Safe's fallback handler, but its screen is the same as migrateSingleton's."
+ }
+}

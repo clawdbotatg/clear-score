@@ -452,7 +452,7 @@ def score_one(d, registry):
         if (WORK / d["hash"] / "cases").exists() else []
     rec = grade.grade(rec)
     rec.pop("cases")
-    SCORES.mkdir(exist_ok=True)
+    SCORES.mkdir(parents=True, exist_ok=True)
     (SCORES / f"{d['hash']}.json").write_text(json.dumps(rec, indent=1, ensure_ascii=False) + "\n")
     s = rec.get("summary") or {}
     print(f"{s.get('grade', '💥')} truth {s.get('truth', '-'):>3} clarity {s.get('clarity', '-'):>3}  {d['file']}  "

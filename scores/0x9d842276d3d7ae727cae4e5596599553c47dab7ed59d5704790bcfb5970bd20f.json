@@ -1,0 +1,105 @@
+{
+ "hash": "0x9d842276d3d7ae727cae4e5596599553c47dab7ed59d5704790bcfb5970bd20f",
+ "file": "registry/consensus-specs/calldata-DepositContract.json",
+ "kind": "calldata",
+ "registry": "b70998caa5dab184243a298a0253b5530428b0f2",
+ "deployments": [
+  {
+   "chainId": 1,
+   "address": "0x00000000219ab540356cbb839cbe05303d7705fa"
+  },
+  {
+   "chainId": 560048,
+   "address": "0x00000000219ab540356cbb839cbe05303d7705fa"
+  }
+ ],
+ "auditedBy": [
+  "0x3846c3a30e62075fa916216b35ef04b8f53931f6"
+ ],
+ "model": "claude-opus-5-5 (high)",
+ "reader": "claude-sonnet-5-5",
+ "prompt": "7bcbb754c1e7",
+ "date": "2026-10-26T15:00Z",
+ "answer": {
+  "formats": [
+   {
+    "key": "deposit(bytes pubkey, bytes withdrawal_credentials, bytes signature, bytes32 deposit_data_root)",
+    "effects": [
+     "The signer sends msg.value in native ETH (at least 1 ETH, a multiple of 1 gwei) to the deposit contract, and the contract keeps it.",
+     "The deposit is recorded for the validator `pubkey` on the consensus layer; it creates a new validator or tops up an existing one.",
+     "For a new validator, `withdrawal_credentials` decides who receives the stake and rewards on withdrawal (for 0x01/0x02 credentials, the address in the last 20 bytes).",
+     "The contract does not check `signature`; it only checks `deposit_data_root` against the other inputs and emits DepositEvent."
+    ],
+    "shown": "The intent \"Stake ETH\", with the validator public key and the withdrawal credentials as raw hex, and the ETH amount sent (\"32 ETH\").",
+    "findings": [
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "spec-limitation",
+      "title": "deposit shows withdrawal credentials only as raw 32 bytes, so the withdrawal address is not named",
+      "evidence": "descriptor deposit format: {\"label\": \"Withdraw credentials\", \"format\": \"raw\", \"path\": \"#.withdrawal_credentials\"}; case 0 shows \"0x0100000000000000000000007e2a2fa2a064f693f0a55c5639476d913ff12d05\". deposit_contract.sol deposit: require(withdrawal_credentials.length == 32). For 0x01/0x02 credentials the last 20 bytes are the withdrawal address; for 0x00 they are a BLS key hash. ERC-7730 cannot choose a format from the prefix byte.",
+      "fix": "Keep the raw field. Optionally add a field with path \"#.withdrawal_credentials.[12:32]\", format \"addressName\", label \"Withdrawal address (0x01/0x02 credentials)\", if the registry accepts the label caveat for 0x00 credentials.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "deposit to an existing validator ignores the shown withdrawal credentials; the screen cannot say so",
+      "evidence": "deposit_contract.sol deposit only emits DepositEvent(pubkey, withdrawal_credentials, amount, signature, index); the consensus layer credits a top-up to the existing validator and keeps its old credentials. That state is not in the calldata.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "deposit hides the signature, and the contract does not verify it",
+      "evidence": "descriptor: {\"label\": \"Signature\", \"path\": \"#.signature\", \"visible\": \"never\"}; deposit_contract.sol deposit only checks require(signature.length == 96) and the deposit_data_root. An invalid signature for a new validator makes the consensus layer skip the deposit, and the ETH stays in the contract. No descriptor format can verify a BLS signature.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 0,
+      "signerEffects": 1,
+      "shownRight": 1,
+      "reader": [
+       "right"
+      ],
+      "notes": "32 ETH native out to the deposit contract, shown as \"Amount to deposit: 32 ETH\". The reader also read the withdrawal address from the raw credentials, but was unsure whether it was theirs."
+     }
+    ],
+    "glance": 82,
+    "depth": 80
+   }
+  ],
+  "couldNotCheck": [
+   "The consensus-layer handling (a top-up to an existing validator, a deposit with an invalid signature) is outside the contract source. I judged it from protocol knowledge, not from code in this directory."
+  ]
+ },
+ "cost": 0.269,
+ "account": "slop_buidlguidl",
+ "seconds": 37,
+ "rubric": "v1.1",
+ "formats": {
+  "deposit(bytes pubkey, bytes withdrawal_credentials, bytes signature, bytes32 deposit_data_root)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 92,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": 100
+  }
+ },
+ "summary": {
+  "grade": "A",
+  "truth": 100,
+  "clarity": 92,
+  "functions": "1A",
+  "incomplete": true,
+  "worst": null
+ }
+}

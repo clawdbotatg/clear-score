@@ -1,0 +1,160 @@
+{
+ "hash": "0xb1794f73721629c01fda2e566c64f1b3ff4832ec51ccdd6db044126dd8ea9c3d",
+ "file": "registry/threshold/calldata-TBTCVault.json",
+ "kind": "calldata",
+ "registry": "b70998caa5dab184243a298a0253b5530428b0f2",
+ "deployments": [
+  {
+   "chainId": 1,
+   "address": "0x9c070027cdc9dc8f82416b2e5314e11dfb4fe3cd"
+  },
+  {
+   "chainId": 11155111,
+   "address": "0xb5679de944a79732a75ce556191df11f489448d5"
+  }
+ ],
+ "auditedBy": [
+  "0x3846c3a30e62075fa916216b35ef04b8f53931f6"
+ ],
+ "model": "claude-opus-5-5 (high)",
+ "reader": "claude-sonnet-5-5",
+ "prompt": "7bcbb754c1e7",
+ "date": "2026-10-26T15:00Z",
+ "answer": {
+  "formats": [
+   {
+    "key": "requestOptimisticMint(bytes32 fundingTxHash, uint32 fundingOutputIndex)",
+    "effects": [
+     "Only a registered Minter can call it, and only while optimistic minting is not paused.",
+     "It records an optimistic minting request (requestedAt = now) for the deposit keyed by keccak256(fundingTxHash | fundingOutputIndex), which starts the guardian cancel delay (3 hours by default).",
+     "No tokens, ETH or approvals move, for the signer or anyone else. The depositor and amount come from Bridge storage and appear only in the event."
+    ],
+    "shown": "\"Request optimistic mint\" with the raw funding tx hash and the output index.",
+    "findings": [
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "requestOptimisticMint: the depositor and the BTC amount come from Bridge storage and cannot be shown.",
+      "evidence": "TBTCOptimisticMinting.sol requestOptimisticMint: `Deposit.DepositRequest memory deposit = bridge.deposits(depositKey);` then the event emits `deposit.depositor, deposit.amount * SATOSHI_MULTIPLIER`. The descriptor shows only fundingTxHash and fundingOutputIndex.",
+      "fix": "None possible in the descriptor. The intent could say that it opens a mint request for a revealed BTC deposit.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "spec-limitation",
+      "title": "requestOptimisticMint: the funding tx hash is likely shown in Bitcoin internal byte order, reversed from explorers.",
+      "evidence": "descriptor field `fundingTxHash` format `raw`. tBTC stores Bitcoin tx hashes as hash256 output (little-endian), so the hex will not match a block explorer. No ERC-7730 format reverses bytes.",
+      "fix": "Put a hint in the label, e.g. 'Funding tx hash (internal byte order)'.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "test-gap",
+      "title": "requestOptimisticMint test case uses a placeholder hash, a wrong description and a tx that does not exist.",
+      "evidence": "cases/0.json: data uses fundingTxHash 0xbbbb…bb, description says 'Request optimistic mint finalization for a deposit', and minedError is 'tx not found'.",
+      "fix": "Use a real mined requestOptimisticMint transaction and describe it correctly.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 65,
+    "depth": 60
+   },
+   {
+    "key": "finalizeOptimisticMint(bytes32 fundingTxHash, uint32 fundingOutputIndex)",
+    "effects": [
+     "Only a registered Minter can call it, when not paused, after the optimistic minting delay has passed since the request, and only if the deposit is not yet swept or finalized.",
+     "It mints (deposit.amount - treasuryFee) * 1e10 TBTC, minus the optimistic minting fee (amount / feeDivisor, 0.2% by default), to the depositor recorded in the Bridge.",
+     "It mints the optimistic minting fee in TBTC to the Bridge treasury.",
+     "It increases the depositor's optimisticMintingDebt by the full amountToMint, which is repaid later when the deposit is swept.",
+     "It marks the request as finalized. No assets of the signer (the Minter) move, and no ETH is taken."
+    ],
+    "shown": "\"Finalize optimistic mint\" with the raw funding tx hash and the output index. It does not say who receives TBTC or how much.",
+    "findings": [
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "finalizeOptimisticMint: the TBTC recipient, mint amount and treasury fee come from storage and are not shown.",
+      "evidence": "TBTCOptimisticMinting.sol finalizeOptimisticMint: `uint256 amountToMint = (deposit.amount - deposit.treasuryFee) * SATOSHI_MULTIPLIER;` `_mint(deposit.depositor, amountToMint - optimisticMintFee);` `_mint(bridge.treasury(), optimisticMintFee);`. The descriptor has only the fundingTxHash and fundingOutputIndex fields.",
+      "fix": "None possible for the values. The intent could read 'Mint tBTC to depositor for revealed BTC deposit'.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "under-simplified",
+      "title": "finalizeOptimisticMint: the intent does not say it mints tBTC to the depositor and books debt.",
+      "evidence": "descriptor intent \"Finalize optimistic mint\". The code mints TBTC to deposit.depositor and adds to optimisticMintingDebt[deposit.depositor].",
+      "fix": "Change the intent to something like 'Mint tBTC for BTC deposit (optimistic)'.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "spec-limitation",
+      "title": "finalizeOptimisticMint: the funding tx hash is likely in internal byte order and will not match explorers.",
+      "evidence": "descriptor field `fundingTxHash` format `raw`. tBTC uses hash256 (little-endian) Bitcoin tx hashes.",
+      "fix": "Put a hint in the label. No format reverses bytes.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "clarity",
+      "kind": "test-gap",
+      "title": "finalizeOptimisticMint test case uses a placeholder hash and a tx that does not exist.",
+      "evidence": "cases/1.json: fundingTxHash 0xbbbb…bb, minedError 'tx not found'.",
+      "fix": "Use a real mined finalizeOptimisticMint transaction.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [],
+    "glance": 50,
+    "depth": 45
+   }
+  ],
+  "couldNotCheck": [
+   "Neither case has a mined transaction (both say 'tx not found'), so I checked nothing against receipts.",
+   "The Bridge source is not in the directory. I could not confirm the byte order of fundingTxHash or the fields of the Bridge deposit struct from the source."
+  ]
+ },
+ "cost": 0.326,
+ "account": "clawd_buidlguidl",
+ "seconds": 53,
+ "rubric": "v1.1",
+ "formats": {
+  "requestOptimisticMint(bytes32 fundingTxHash, uint32 fundingOutputIndex)": {
+   "grade": "B",
+   "truth": 100,
+   "clarity": 62,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": null
+  },
+  "finalizeOptimisticMint(bytes32 fundingTxHash, uint32 fundingOutputIndex)": {
+   "grade": "C",
+   "truth": 100,
+   "clarity": 48,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": null
+  }
+ },
+ "summary": {
+  "grade": "C",
+  "truth": 100,
+  "clarity": 55,
+  "functions": "1B 1C",
+  "incomplete": true,
+  "worst": null
+ }
+}
