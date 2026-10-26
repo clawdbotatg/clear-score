@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "required": ["oneLine", "leaves", "arrives", "permissions", "other", "unsure"],
+  "properties": {
+    "oneLine": {"type": "string", "description": "what you think this does, in at most 15 words"},
+    "leaves": {"type": "array", "items": {"type": "string"}, "description": "each asset that leaves your wallet: amount (or 'up to'), asset, to whom"},
+    "arrives": {"type": "array", "items": {"type": "string"}, "description": "each asset you get: amount (or 'at least'), asset, from whom"},
+    "permissions": {"type": "array", "items": {"type": "string"}, "description": "each permission you give: who can do what with what"},
+    "other": {"type": "array", "items": {"type": "string"}, "description": "anything else that changes for you (a position, a setting, an owner)"},
+    "unsure": {"type": "array", "items": {"type": "string"}, "description": "what you can't tell from the screen"}
+  }
+}

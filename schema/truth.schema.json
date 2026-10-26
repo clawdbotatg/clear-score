@@ -1,0 +1,63 @@
+{
+  "type": "object",
+  "required": ["formats", "couldNotCheck"],
+  "properties": {
+    "formats": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["key", "effects", "shown", "findings", "cases", "glance", "depth"],
+        "properties": {
+          "key": {"type": "string", "description": "the format key exactly as in display.formats"},
+          "effects": {
+            "type": "array",
+            "description": "every effect of this function on the signer, from the code: one plain sentence each",
+            "items": {"type": "string"}
+          },
+          "shown": {"type": "string", "description": "one sentence: what the screen tells the signer"},
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["severity", "axis", "kind", "title", "evidence", "groundTruth"],
+              "properties": {
+                "severity": {"enum": ["critical", "warning", "info"]},
+                "axis": {"enum": ["truth", "completeness", "clarity"]},
+                "kind": {"enum": ["wrong-asset", "wrong-amount", "wrong-party", "wrong-action", "hidden-effect",
+                                  "hidden-value", "wrong-metadata", "wrong-binding", "raw-value", "unreadable",
+                                  "over-simplified", "under-simplified", "misleading-label", "spec-limitation",
+                                  "test-gap", "prompt-injection", "other"]},
+                "title": {"type": "string", "description": "one sentence, at most 20 words: the function and what is wrong"},
+                "evidence": {"type": "string", "description": "the code line(s) and descriptor text it rests on, with file and function; for groundTruth, the case index and the effect"},
+                "fix": {"type": "string"},
+                "groundTruth": {"type": "boolean", "description": "true only when a mined transaction's effects (cases/*.json) show it"}
+              }
+            }
+          },
+          "cases": {
+            "type": "array",
+            "description": "one per test case of this format that has mined effects",
+            "items": {
+              "type": "object",
+              "required": ["index", "signerEffects", "shownRight", "reader"],
+              "properties": {
+                "index": {"type": "integer"},
+                "signerEffects": {"type": "integer", "description": "how many distinct effects on the signer the mined tx had (merge the same asset and direction)"},
+                "shownRight": {"type": "integer", "description": "how many of those the screen states right (asset, amount or bound, party)"},
+                "reader": {
+                  "type": "array",
+                  "description": "for each signer effect, how the blind reader understood it",
+                  "items": {"enum": ["right", "partial", "missed", "wrong"]}
+                },
+                "notes": {"type": "string"}
+              }
+            }
+          },
+          "glance": {"type": "integer", "minimum": 0, "maximum": 100, "description": "intent + interpolated intent alone: how well a non-expert knows what happens (100 = fully, no surprise)"},
+          "depth": {"type": "integer", "minimum": 0, "maximum": 100, "description": "the fields: how well someone who reads all of them can verify every effect"}
+        }
+      }
+    },
+    "couldNotCheck": {"type": "array", "items": {"type": "string"}, "description": "what kept you from checking an effect: missing source, unresolved proxy. Empty when nothing did."}
+  }
+}
