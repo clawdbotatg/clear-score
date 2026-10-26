@@ -1,0 +1,811 @@
+{
+ "hash": "0x53b8ac2c9d72e19349b0686cc955d3e08885c6595ca50a905cf501982d7f5e02",
+ "file": "registry/uniswap/calldata-UniswapV2Router02.json",
+ "kind": "calldata",
+ "registry": "b70998caa5dab184243a298a0253b5530428b0f2",
+ "deployments": [
+  {
+   "chainId": 1,
+   "address": "0x7a250d5630b4cf539739df2c5dacb4c659f2488d"
+  }
+ ],
+ "auditedBy": [],
+ "model": "claude-opus-5-5 (high)",
+ "reader": "claude-sonnet-5-5",
+ "prompt": "7bcbb754c1e7",
+ "date": "2026-10-26T14:55Z",
+ "answer": {
+  "formats": [
+   {
+    "key": "addLiquidity(address tokenA,address tokenB,uint256 amountADesired,uint256 amountBDesired,uint256 amountAMin,uint256 amountBMin,address to,uint256 deadline)",
+    "effects": [
+     "The signer sends up to amountADesired of tokenA to the pair, at least amountAMin.",
+     "The signer sends up to amountBDesired of tokenB to the pair, at least amountBMin.",
+     "The router creates the pair if it does not exist yet.",
+     "The pair mints LP tokens (UNI-V2) to `to`; the pool decides the amount."
+    ],
+    "shown": "Add up to X tokenA and up to Y tokenB as liquidity, with minimums, the recipient and the deadline.",
+    "findings": [
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "addLiquidity does not show the LP tokens received; the pool decides the amount, and no minimum exists.",
+      "evidence": "Case 0: UNI-V2 2961077006359078 arrives at the signer from 0x0; screen says only 'as liquidity' and 'Recipient'. UniswapV2Router02.addLiquidity: liquidity = IUniswapV2Pair(pair).mint(to).",
+      "fix": "Rename the 'Recipient' label to 'LP Tokens Recipient' so the signer knows what `to` receives.",
+      "groundTruth": true
+     }
+    ],
+    "cases": [
+     {
+      "index": 0,
+      "signerEffects": 3,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "right",
+       "partial"
+      ],
+      "notes": "LP amount not shown; pool decides it."
+     }
+    ],
+    "glance": 80,
+    "depth": 82
+   },
+   {
+    "key": "addLiquidityETH(address token,uint256 amountTokenDesired,uint256 amountTokenMin,uint256 amountETHMin,address to,uint256 deadline)",
+    "effects": [
+     "The signer sends up to amountTokenDesired of token to the pair, at least amountTokenMin.",
+     "The signer sends msg.value ETH; the router wraps the ETH used to WETH and sends it to the pair.",
+     "The router refunds unused ETH to msg.sender.",
+     "The pair mints LP tokens to `to`; the pool decides the amount."
+    ],
+    "shown": "Add up to X token and up to Y ETH as liquidity, with minimums, the recipient and the deadline.",
+    "findings": [
+     {
+      "severity": "info",
+      "axis": "completeness",
+      "kind": "spec-limitation",
+      "title": "addLiquidityETH does not show the LP tokens received; the pool decides the amount.",
+      "evidence": "Case 1: UNI-V2 62048368229954282979666 arrives at the signer; screen shows no LP amount. UniswapV2Router02.addLiquidityETH: liquidity = IUniswapV2Pair(pair).mint(to).",
+      "fix": "Rename the 'Recipient' label to 'LP Tokens Recipient'.",
+      "groundTruth": true
+     }
+    ],
+    "cases": [
+     {
+      "index": 1,
+      "signerEffects": 3,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "right",
+       "partial"
+      ],
+      "notes": "ETH and token out are shown; LP amount not shown."
+     }
+    ],
+    "glance": 80,
+    "depth": 82
+   },
+   {
+    "key": "removeLiquidity(address tokenA,address tokenB,uint256 liquidity,uint256 amountAMin,uint256 amountBMin,address to,uint256 deadline)",
+    "effects": [
+     "The router pulls `liquidity` LP tokens from the signer to the pair (allowance spent).",
+     "The pair burns them and sends tokenA and tokenB to `to`, at least amountAMin and amountBMin as computed by the pair."
+    ],
+    "shown": "Remove N UNI-V2 for at least A tokenA and B tokenB, with the recipient and the deadline.",
+    "findings": [
+     {
+      "severity": "info",
+      "axis": "truth",
+      "kind": "spec-limitation",
+      "title": "removeLiquidity checks minimums on pair amounts; a fee-on-transfer token arrives below 'Minimum to Receive'.",
+      "evidence": "UniswapV2Router02.removeLiquidity: (amount0, amount1) = IUniswapV2Pair(pair).burn(to); require(amountA >= amountAMin). The check does not use what `to` receives.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 2,
+      "signerEffects": 2,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "right"
+      ],
+      "notes": "Mined effects show only WETH in; no EMERALD transfer is recorded."
+     }
+    ],
+    "glance": 85,
+    "depth": 85
+   },
+   {
+    "key": "removeLiquidityETH(address token,uint256 liquidity,uint256 amountTokenMin,uint256 amountETHMin,address to,uint256 deadline)",
+    "effects": [
+     "The router pulls `liquidity` LP tokens from the signer to the pair.",
+     "The router receives token and WETH, sends the token amount to `to`, unwraps WETH and sends ETH to `to`.",
+     "Minimums amountTokenMin and amountETHMin apply."
+    ],
+    "shown": "Remove N UNI-V2 for at least X token and Y ETH, with the recipient and the deadline.",
+    "findings": [
+     {
+      "severity": "info",
+      "axis": "truth",
+      "kind": "spec-limitation",
+      "title": "removeLiquidityETH checks the token minimum before the transfer; a fee-on-transfer token arrives below it.",
+      "evidence": "UniswapV2Router02.removeLiquidityETH: removeLiquidity(... address(this) ...); TransferHelper.safeTransfer(token, to, amountToken).",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 3,
+      "signerEffects": 3,
+      "shownRight": 3,
+      "reader": [
+       "right",
+       "right",
+       "right"
+      ],
+      "notes": "Minimums are 0; reader saw no protection, correct."
+     }
+    ],
+    "glance": 85,
+    "depth": 85
+   },
+   {
+    "key": "removeLiquidityETHSupportingFeeOnTransferTokens(address token,uint256 liquidity,uint256 amountTokenMin,uint256 amountETHMin,address to,uint256 deadline)",
+    "effects": [
+     "The router pulls `liquidity` LP tokens from the signer to the pair.",
+     "The router sends its whole token balance to `to`, after token fees; amountTokenMin applies before fees.",
+     "The router unwraps WETH and sends at least amountETHMin ETH to `to`."
+    ],
+    "shown": "Remove N UNI-V2 for at least Y ETH and X token before token fees, with the recipient and the deadline.",
+    "findings": [],
+    "cases": [
+     {
+      "index": 4,
+      "signerEffects": 3,
+      "shownRight": 3,
+      "reader": [
+       "right",
+       "right",
+       "right"
+      ],
+      "notes": ""
+     }
+    ],
+    "glance": 85,
+    "depth": 86
+   },
+   {
+    "key": "removeLiquidityETHWithPermit(address token,uint256 liquidity,uint256 amountTokenMin,uint256 amountETHMin,address to,uint256 deadline,bool approveMax,uint8 v,bytes32 r,bytes32 s)",
+    "effects": [
+     "The router calls permit on the pair: the signer's LP allowance to the router becomes unlimited when approveMax is true, else `liquidity`.",
+     "An unlimited LP allowance stays after the call.",
+     "The router pulls `liquidity` LP tokens, sends the token and ETH to `to` with the minimums."
+    ],
+    "shown": "Remove N UNI-V2 for at least X token and Y ETH; a field 'LP Token Approval' says Unlimited to router or This removal only.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "over-simplified",
+      "title": "removeLiquidityETHWithPermit sentence omits the LP approval, which can stay unlimited after the call.",
+      "evidence": "UniswapV2Router02.removeLiquidityETHWithPermit: uint value = approveMax ? uint(-1) : liquidity; permit(msg.sender, address(this), value, ...). Descriptor interpolatedIntent: 'Remove {liquidity} UNI-V2 for at least {amountTokenMin} and {amountETHMin}'. Case 5 grants unlimited UNI-V2 allowance.",
+      "fix": "Change the interpolatedIntent to 'Remove {liquidity} UNI-V2 for at least {amountTokenMin} and {amountETHMin}, LP approval: {approveMax}'.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 5,
+      "signerEffects": 4,
+      "shownRight": 4,
+      "reader": [
+       "right",
+       "right",
+       "right",
+       "right"
+      ],
+      "notes": "Unlimited approval is shown in a field."
+     }
+    ],
+    "glance": 72,
+    "depth": 86
+   },
+   {
+    "key": "removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(address token,uint256 liquidity,uint256 amountTokenMin,uint256 amountETHMin,address to,uint256 deadline,bool approveMax,uint8 v,bytes32 r,bytes32 s)",
+    "effects": [
+     "The router calls permit on the pair: the LP allowance becomes unlimited or `liquidity`.",
+     "The router pulls `liquidity` LP tokens, sends its whole token balance and the ETH to `to`; the token minimum applies before fees."
+    ],
+    "shown": "Remove N UNI-V2 for at least Y ETH and X token before token fees; a field shows the LP approval scope.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "over-simplified",
+      "title": "removeLiquidityETHWithPermitSupportingFeeOnTransferTokens sentence omits the LP approval, which can stay unlimited.",
+      "evidence": "UniswapV2Router02: uint value = approveMax ? uint(-1) : liquidity; permit(...). Descriptor interpolatedIntent does not reference approveMax.",
+      "fix": "Add ', LP approval: {approveMax}' to the interpolatedIntent.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 6,
+      "signerEffects": 4,
+      "shownRight": 4,
+      "reader": [
+       "right",
+       "right",
+       "right",
+       "right"
+      ],
+      "notes": ""
+     }
+    ],
+    "glance": 72,
+    "depth": 86
+   },
+   {
+    "key": "removeLiquidityWithPermit(address tokenA,address tokenB,uint256 liquidity,uint256 amountAMin,uint256 amountBMin,address to,uint256 deadline,bool approveMax,uint8 v,bytes32 r,bytes32 s)",
+    "effects": [
+     "The router calls permit on the pair: the LP allowance becomes unlimited or `liquidity`.",
+     "The router pulls `liquidity` LP tokens; the pair sends tokenA and tokenB to `to` with the minimums."
+    ],
+    "shown": "Remove N UNI-V2 for at least A tokenA and B tokenB; a field shows the LP approval scope.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "over-simplified",
+      "title": "removeLiquidityWithPermit sentence omits the LP approval, which can stay unlimited after the call.",
+      "evidence": "UniswapV2Router02.removeLiquidityWithPermit: uint value = approveMax ? uint(-1) : liquidity; permit(...). interpolatedIntent: 'Remove {liquidity} UNI-V2 for at least {amountAMin} and {amountBMin}'.",
+      "fix": "Add ', LP approval: {approveMax}' to the interpolatedIntent.",
+      "groundTruth": false
+     },
+     {
+      "severity": "info",
+      "axis": "truth",
+      "kind": "spec-limitation",
+      "title": "removeLiquidityWithPermit checks minimums on pair amounts; fee-on-transfer tokens arrive below them.",
+      "evidence": "UniswapV2Router02.removeLiquidity: burn(to); require(amountA >= amountAMin).",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 7,
+      "signerEffects": 4,
+      "shownRight": 4,
+      "reader": [
+       "right",
+       "right",
+       "right",
+       "right"
+      ],
+      "notes": ""
+     }
+    ],
+    "glance": 75,
+    "depth": 86
+   },
+   {
+    "key": "swapETHForExactTokens(uint256 amountOut,address[] path,address to,uint256 deadline)",
+    "effects": [
+     "The signer sends msg.value ETH; the router wraps what the swap needs.",
+     "`to` receives exactly amountOut of path[-1].",
+     "The router refunds unused ETH to msg.sender."
+    ],
+    "shown": "Swap at most X ETH for Y token, with the recipient and the deadline.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "over-simplified",
+      "title": "swapETHForExactTokens sentence omits the recipient, which can differ from the signer.",
+      "evidence": "UniswapV2Router02.swapETHForExactTokens: _swap(amounts, path, to). interpolatedIntent: 'Swap at most {@.value} for {amountOut}'.",
+      "fix": "Change the interpolatedIntent to 'Swap at most {@.value} for {amountOut} to {to}'.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 8,
+      "signerEffects": 2,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "right"
+      ],
+      "notes": "Refund kept net ETH under the maximum shown."
+     }
+    ],
+    "glance": 85,
+    "depth": 88
+   },
+   {
+    "key": "swapExactETHForTokens(uint256 amountOutMin,address[] path,address to,uint256 deadline)",
+    "effects": [
+     "The signer sends msg.value ETH; the router wraps it to WETH.",
+     "`to` receives at least amountOutMin of path[-1]."
+    ],
+    "shown": "Swap X ETH for at least Y token, with the recipient and the deadline.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "over-simplified",
+      "title": "swapExactETHForTokens sentence omits the recipient, which can differ from the signer.",
+      "evidence": "UniswapV2Router02.swapExactETHForTokens: _swap(amounts, path, to). interpolatedIntent: 'Swap {@.value} for at least {amountOutMin}'.",
+      "fix": "Change the interpolatedIntent to 'Swap {@.value} for at least {amountOutMin} to {to}'.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 9,
+      "signerEffects": 2,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "right"
+      ],
+      "notes": ""
+     }
+    ],
+    "glance": 85,
+    "depth": 88
+   },
+   {
+    "key": "swapExactETHForTokensSupportingFeeOnTransferTokens(uint256 amountOutMin,address[] path,address to,uint256 deadline)",
+    "effects": [
+     "The signer sends msg.value ETH; the router wraps it to WETH.",
+     "`to` receives at least amountOutMin of path[-1], measured on its balance change."
+    ],
+    "shown": "Swap X ETH for at least Y token, with the recipient and the deadline.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "over-simplified",
+      "title": "swapExactETHForTokensSupportingFeeOnTransferTokens sentence omits the recipient, which can differ from the signer.",
+      "evidence": "UniswapV2Router02: balanceOf(to).sub(balanceBefore) >= amountOutMin. interpolatedIntent: 'Swap {@.value} for at least {amountOutMin}'.",
+      "fix": "Change the interpolatedIntent to 'Swap {@.value} for at least {amountOutMin} to {to}'.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 10,
+      "signerEffects": 2,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "right"
+      ],
+      "notes": "Minimum 0 understood as no protection."
+     }
+    ],
+    "glance": 85,
+    "depth": 88
+   },
+   {
+    "key": "swapExactTokensForETH(uint256 amountIn,uint256 amountOutMin,address[] path,address to,uint256 deadline)",
+    "effects": [
+     "The router pulls amountIn of path[0] from the signer (allowance spent).",
+     "The router unwraps WETH and sends at least amountOutMin ETH to `to`."
+    ],
+    "shown": "Swap X token for at least Y ETH, with the recipient and the deadline.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "over-simplified",
+      "title": "swapExactTokensForETH sentence omits the recipient, which can differ from the signer.",
+      "evidence": "UniswapV2Router02.swapExactTokensForETH: TransferHelper.safeTransferETH(to, amounts[amounts.length - 1]). interpolatedIntent: 'Swap {amountIn} for at least {amountOutMin}'.",
+      "fix": "Change the interpolatedIntent to 'Swap {amountIn} for at least {amountOutMin} to {to}'.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 11,
+      "signerEffects": 2,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "right"
+      ],
+      "notes": ""
+     },
+     {
+      "index": 12,
+      "signerEffects": 2,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "right"
+      ],
+      "notes": ""
+     }
+    ],
+    "glance": 85,
+    "depth": 88
+   },
+   {
+    "key": "swapExactTokensForETHSupportingFeeOnTransferTokens(uint256 amountIn,uint256 amountOutMin,address[] path,address to,uint256 deadline)",
+    "effects": [
+     "The router pulls amountIn of path[0] from the signer (allowance spent).",
+     "The router unwraps its WETH output and sends at least amountOutMin ETH to `to`."
+    ],
+    "shown": "Swap X token for at least Y ETH, with the recipient and the deadline.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "over-simplified",
+      "title": "swapExactTokensForETHSupportingFeeOnTransferTokens sentence omits the recipient; in case 13 the ETH went elsewhere.",
+      "evidence": "Case 13: ETH 24191772045398437 goes to 0x75aDC37E…, not to the signer 0x6aeb…; the 'Recipient' field shows it, but the interpolatedIntent 'Swap 2105496.648067163 Gato for at least 0 ETH' does not.",
+      "fix": "Change the interpolatedIntent to 'Swap {amountIn} for at least {amountOutMin} to {to}'.",
+      "groundTruth": true
+     }
+    ],
+    "cases": [
+     {
+      "index": 13,
+      "signerEffects": 2,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "partial"
+      ],
+      "notes": "Second effect is the existing allowance spent by amountIn; output ETH went to a third-party recipient, shown in the field."
+     }
+    ],
+    "glance": 80,
+    "depth": 88
+   },
+   {
+    "key": "swapExactTokensForTokens(uint256 amountIn,uint256 amountOutMin,address[] path,address to,uint256 deadline)",
+    "effects": [
+     "The router pulls amountIn of path[0] from the signer to the first pair (allowance spent).",
+     "`to` receives at least amountOutMin of path[-1]."
+    ],
+    "shown": "Swap X tokenIn for at least Y tokenOut, with the recipient and the deadline.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "over-simplified",
+      "title": "swapExactTokensForTokens sentence omits the recipient, which can differ from the signer.",
+      "evidence": "UniswapV2Router02.swapExactTokensForTokens: _swap(amounts, path, to). interpolatedIntent: 'Swap {amountIn} for at least {amountOutMin}'.",
+      "fix": "Change the interpolatedIntent to 'Swap {amountIn} for at least {amountOutMin} to {to}'.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 14,
+      "signerEffects": 2,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "right"
+      ],
+      "notes": ""
+     }
+    ],
+    "glance": 85,
+    "depth": 88
+   },
+   {
+    "key": "swapExactTokensForTokensSupportingFeeOnTransferTokens(uint256 amountIn,uint256 amountOutMin,address[] path,address to,uint256 deadline)",
+    "effects": [
+     "The router pulls amountIn of path[0] from the signer to the first pair (allowance spent).",
+     "`to` receives at least amountOutMin of path[-1], measured on its balance change."
+    ],
+    "shown": "Swap X tokenIn for at least Y tokenOut, with the recipient and the deadline.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "over-simplified",
+      "title": "swapExactTokensForTokensSupportingFeeOnTransferTokens sentence omits the recipient; in case 15 WETH went elsewhere.",
+      "evidence": "Case 15: WETH 654672582889328081 goes to 0x3CB085…, not the signer 0x5c4d…; interpolatedIntent 'Swap 5824322104 AXIS for at least 0 WETH' does not name it.",
+      "fix": "Change the interpolatedIntent to 'Swap {amountIn} for at least {amountOutMin} to {to}'.",
+      "groundTruth": true
+     }
+    ],
+    "cases": [
+     {
+      "index": 15,
+      "signerEffects": 2,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "partial"
+      ],
+      "notes": "Second effect is the existing allowance spent; output went to a third party, shown in the field."
+     }
+    ],
+    "glance": 80,
+    "depth": 88
+   },
+   {
+    "key": "swapTokensForExactETH(uint256 amountOut,uint256 amountInMax,address[] path,address to,uint256 deadline)",
+    "effects": [
+     "The router pulls the needed amount of path[0] from the signer, at most amountInMax (allowance spent).",
+     "The router unwraps WETH and sends exactly amountOut ETH to `to`."
+    ],
+    "shown": "Swap at most X token for Y ETH, with the recipient and the deadline.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "over-simplified",
+      "title": "swapTokensForExactETH sentence omits the recipient, which can differ from the signer.",
+      "evidence": "UniswapV2Router02.swapTokensForExactETH: TransferHelper.safeTransferETH(to, amounts[amounts.length - 1]). interpolatedIntent: 'Swap at most {amountInMax} for {amountOut}'.",
+      "fix": "Change the interpolatedIntent to 'Swap at most {amountInMax} for {amountOut} to {to}'.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 16,
+      "signerEffects": 3,
+      "shownRight": 3,
+      "reader": [
+       "right",
+       "right",
+       "partial"
+      ],
+      "notes": "Third effect is the existing allowance spent."
+     }
+    ],
+    "glance": 85,
+    "depth": 88
+   },
+   {
+    "key": "swapTokensForExactTokens(uint256 amountOut,uint256 amountInMax,address[] path,address to,uint256 deadline)",
+    "effects": [
+     "The router pulls the needed amount of path[0] from the signer, at most amountInMax (allowance spent).",
+     "`to` receives exactly amountOut of path[-1]."
+    ],
+    "shown": "Swap at most X tokenIn for Y tokenOut, with the recipient and the deadline.",
+    "findings": [
+     {
+      "severity": "warning",
+      "axis": "clarity",
+      "kind": "over-simplified",
+      "title": "swapTokensForExactTokens sentence omits the recipient, which can differ from the signer.",
+      "evidence": "UniswapV2Router02.swapTokensForExactTokens: _swap(amounts, path, to). interpolatedIntent: 'Swap at most {amountInMax} for {amountOut}'.",
+      "fix": "Change the interpolatedIntent to 'Swap at most {amountInMax} for {amountOut} to {to}'.",
+      "groundTruth": false
+     }
+    ],
+    "cases": [
+     {
+      "index": 17,
+      "signerEffects": 2,
+      "shownRight": 2,
+      "reader": [
+       "right",
+       "right"
+      ],
+      "notes": ""
+     }
+    ],
+    "glance": 85,
+    "depth": 88
+   }
+  ],
+  "couldNotCheck": [
+   "Case 2 (removeLiquidity): the mined effects show WETH in but no EMERALD transfer to the signer, although pair.burn sends both tokens to `to` and amountBMin is 1.121249 EMERALD. The EMERALD token may not emit standard Transfer events; its source is not in the directory."
+  ]
+ },
+ "cost": 1.326,
+ "account": "ethereum_foundation",
+ "seconds": 275,
+ "rubric": "v1.1",
+ "formats": {
+  "addLiquidity(address tokenA,address tokenB,uint256 amountADesired,uint256 amountBDesired,uint256 amountAMin,uint256 amountBMin,address to,uint256 deadline)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 82,
+   "measured": true,
+   "groundTruth": true,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": 83
+  },
+  "addLiquidityETH(address token,uint256 amountTokenDesired,uint256 amountTokenMin,uint256 amountETHMin,address to,uint256 deadline)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 82,
+   "measured": true,
+   "groundTruth": true,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": 83
+  },
+  "removeLiquidity(address tokenA,address tokenB,uint256 liquidity,uint256 amountAMin,uint256 amountBMin,address to,uint256 deadline)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 94,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": 100
+  },
+  "removeLiquidityETH(address token,uint256 liquidity,uint256 amountTokenMin,uint256 amountETHMin,address to,uint256 deadline)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 94,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": 100
+  },
+  "removeLiquidityETHSupportingFeeOnTransferTokens(address token,uint256 liquidity,uint256 amountTokenMin,uint256 amountETHMin,address to,uint256 deadline)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 94,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": 100
+  },
+  "removeLiquidityETHWithPermit(address token,uint256 liquidity,uint256 amountTokenMin,uint256 amountETHMin,address to,uint256 deadline,bool approveMax,uint8 v,bytes32 r,bytes32 s)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 87,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "removeLiquidityETHWithPermit sentence omits the LP approval, which can stay unlimited after the call.",
+   "comprehension": 100
+  },
+  "removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(address token,uint256 liquidity,uint256 amountTokenMin,uint256 amountETHMin,address to,uint256 deadline,bool approveMax,uint8 v,bytes32 r,bytes32 s)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 87,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "removeLiquidityETHWithPermitSupportingFeeOnTransferTokens sentence omits the LP approval, which can stay unlimited.",
+   "comprehension": 100
+  },
+  "removeLiquidityWithPermit(address tokenA,address tokenB,uint256 liquidity,uint256 amountAMin,uint256 amountBMin,address to,uint256 deadline,bool approveMax,uint8 v,bytes32 r,bytes32 s)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 87,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "removeLiquidityWithPermit sentence omits the LP approval, which can stay unlimited after the call.",
+   "comprehension": 100
+  },
+  "swapETHForExactTokens(uint256 amountOut,address[] path,address to,uint256 deadline)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 90,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "swapETHForExactTokens sentence omits the recipient, which can differ from the signer.",
+   "comprehension": 100
+  },
+  "swapExactETHForTokens(uint256 amountOutMin,address[] path,address to,uint256 deadline)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 90,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "swapExactETHForTokens sentence omits the recipient, which can differ from the signer.",
+   "comprehension": 100
+  },
+  "swapExactETHForTokensSupportingFeeOnTransferTokens(uint256 amountOutMin,address[] path,address to,uint256 deadline)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 90,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "swapExactETHForTokensSupportingFeeOnTransferTokens sentence omits the recipient, which can differ from the signer.",
+   "comprehension": 100
+  },
+  "swapExactTokensForETH(uint256 amountIn,uint256 amountOutMin,address[] path,address to,uint256 deadline)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 90,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "swapExactTokensForETH sentence omits the recipient, which can differ from the signer.",
+   "comprehension": 100
+  },
+  "swapExactTokensForETHSupportingFeeOnTransferTokens(uint256 amountIn,uint256 amountOutMin,address[] path,address to,uint256 deadline)": {
+   "grade": "B",
+   "truth": 100,
+   "clarity": 74,
+   "measured": true,
+   "groundTruth": true,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "swapExactTokensForETHSupportingFeeOnTransferTokens sentence omits the recipient; in case 13 the ETH went elsewhere.",
+   "comprehension": 75
+  },
+  "swapExactTokensForTokens(uint256 amountIn,uint256 amountOutMin,address[] path,address to,uint256 deadline)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 90,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "swapExactTokensForTokens sentence omits the recipient, which can differ from the signer.",
+   "comprehension": 100
+  },
+  "swapExactTokensForTokensSupportingFeeOnTransferTokens(uint256 amountIn,uint256 amountOutMin,address[] path,address to,uint256 deadline)": {
+   "grade": "B",
+   "truth": 100,
+   "clarity": 74,
+   "measured": true,
+   "groundTruth": true,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "swapExactTokensForTokensSupportingFeeOnTransferTokens sentence omits the recipient; in case 15 WETH went elsewhere.",
+   "comprehension": 75
+  },
+  "swapTokensForExactETH(uint256 amountOut,uint256 amountInMax,address[] path,address to,uint256 deadline)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 80,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "swapTokensForExactETH sentence omits the recipient, which can differ from the signer.",
+   "comprehension": 83
+  },
+  "swapTokensForExactTokens(uint256 amountOut,uint256 amountInMax,address[] path,address to,uint256 deadline)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 90,
+   "measured": true,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 1,
+   "worst": "swapTokensForExactTokens sentence omits the recipient, which can differ from the signer.",
+   "comprehension": 100
+  }
+ },
+ "summary": {
+  "grade": "B",
+  "truth": 100,
+  "clarity": 87,
+  "functions": "15A 2B",
+  "incomplete": true,
+  "worst": "swapExactTokensForETHSupportingFeeOnTransferTokens sentence omits the recipient; in case 13 the ETH went elsewhere."
+ }
+}

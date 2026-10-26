@@ -1,4 +1,4 @@
-# Rubric v1
+# Rubric v1.1
 
 Two scores per function (format), 0–100, and a letter. `grade.py` computes all of it from the agent's saved
 answer, so a rubric change is `./score.py grade`, no model calls.
@@ -13,7 +13,9 @@ Start at 100.
   or rights that is missing or shown wrong): truth drops to 25, and 25 more for each further one.
 - Each **warning** on truth or completeness: −10.
 - **Receipts cap it.** For every test case that is a real mined tx, the agent counts the signer's real effects
-  (tokens and ETH out, in, approvals given) and how many the screen states right. Truth is at most that share.
+  (tokens and ETH out, in, approvals given) and how many the screen states right. Truth is at most that share,
+  when a warning or critical backed by a receipt explains the gap. An effect no descriptor can show (the LP
+  tokens a pool decides) is an info and costs nothing.
 - Info findings cost nothing (nothing a descriptor can fix).
 
 Severity follows the registry's own AI review scale (`.github/scripts/ai-review/prompt.md`: `<severity>`,

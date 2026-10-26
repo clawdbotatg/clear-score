@@ -1,0 +1,119 @@
+{
+"functions": {
+"1:0x004c226fff73aa94b78a4df1a0e861797ba16819:0x254209ba": {
+"clarity": 90,
+"file": "registry/kiln/calldata-kiln-batch-exit.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0x02751cec": {
+"clarity": 94,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0x18cbafe5": {
+"clarity": 90,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0x2195995c": {
+"clarity": 87,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0x38ed1739": {
+"clarity": 90,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0x4a25d94a": {
+"clarity": 80,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0x5b0d5984": {
+"clarity": 87,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0x5c11d795": {
+"clarity": 74,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "B",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0x791ac947": {
+"clarity": 74,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "B",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0x7ff36ab5": {
+"clarity": 90,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0x8803dbee": {
+"clarity": 90,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0xaf2979eb": {
+"clarity": 94,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0xb6f9de95": {
+"clarity": 90,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0xbaa2abde": {
+"clarity": 94,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0xded9382a": {
+"clarity": 87,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0xe8e33700": {
+"clarity": 82,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0xf305d719": {
+"clarity": 82,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"1:0x7a250d5630b4cf539739df2c5dacb4c659f2488d:0xfb3bdb41": {
+"clarity": 90,
+"file": "registry/uniswap/calldata-UniswapV2Router02.json",
+"grade": "A",
+"truth": 100
+},
+"560048:0x06f9c32a3093dde837a2e172041df79b4b850a2e:0x254209ba": {
+"clarity": 90,
+"file": "registry/kiln/calldata-kiln-batch-exit.json",
+"grade": "A",
+"truth": 100
+}
+},
+"rubric": "v1.1"
+}

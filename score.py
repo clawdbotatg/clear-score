@@ -397,21 +397,22 @@ def render(screen):
 
 
 def read_blind(w):
-    """The blind reader: a fresh model with no code and no descriptor, only the screen."""
+    """The blind reader: a fresh model with no code and no descriptor, only the screen. Cases in parallel."""
     system = (ROOT / "prompts/reader.md").read_text()
     schema = json.loads((ROOT / "schema/reader.schema.json").read_text())
-    cost = 0
-    for f in sorted((w / "cases").glob("*.json"), key=lambda f: int(f.stem)):
+
+    def one(f):
         c = json.loads(f.read_text())
         if "reader" in c or not c.get("mined"):
-            continue
-        you = (c.get("mined") or {}).get("signer") or c.get("from") or "unknown"
+            return 0
+        you = c["mined"].get("signer") or c.get("from") or "unknown"
         out, k, _ = claude(f"Your wallet's address: {you}\n\nThe screen:\n\n" + render(c["screen"]), system, schema,
                            tempfile.gettempdir(), READER, "low", [])
         c["reader"] = out
-        cost += k
         f.write_text(json.dumps(c, indent=1))
-    return cost
+        return k
+    with cf.ThreadPoolExecutor(6) as ex:
+        return sum(ex.map(one, sorted((w / "cases").glob("*.json"))))
 
 
 def truth(w):
@@ -527,7 +528,7 @@ def index():
             for key, f in (r.get("formats") or {}).items():
                 sel = selector(key) if "(" in key else key.split("(")[0]
                 out[f"{x['chainId']}:{x['address']}:{sel}"] = {"grade": f["grade"], "truth": f["truth"], "clarity": f["clarity"],
-                                                               "hash": r["hash"], "file": r["file"]}
+                                                               "file": r["file"]}
     (ROOT / "index.json").write_text(json.dumps({"rubric": grade.RUBRIC, "functions": out}, indent=0, sort_keys=True) + "\n")
     print(f"{len(out)} functions")
 

@@ -1,6 +1,6 @@
 # Evidence → numbers. The agent writes findings and per-case judgments; this file alone decides the scores, so the
 # rubric can change and `./score.py grade` recomputes every score with no model call. Rules: RUBRIC.md.
-RUBRIC = "v1"
+RUBRIC = "v1.1"
 
 CRIT_TRUTH = 25        # a critical truth/completeness finding caps truth here, and each further one takes this off
 WARN_TRUTH = 10        # each truth/completeness warning
@@ -30,8 +30,10 @@ def format_score(f, cases):
     if crit:
         truth = min(truth, CRIT_TRUTH) - CRIT_TRUTH * (len(crit) - 1)
     # Receipts: the share of the signer's real effects the screen states right (only cases the agent judged).
+    # Only when a fixable gap backs it: an effect no descriptor can show (info, spec-limitation) costs nothing.
     shown = [(c["shownRight"], c["signerEffects"]) for c in f.get("cases") or [] if c.get("signerEffects")]
-    if shown:
+    backed = [x for x in fs if x.get("groundTruth") and x["severity"] != "info" and x["axis"] in ("truth", "completeness")]
+    if shown and backed:
         truth = min(truth, round(100 * sum(a for a, _ in shown) / sum(b for _, b in shown)))
     truth = max(0, truth)
     # Clarity: what a blind reader got from the screen, then the glance and depth judgments.

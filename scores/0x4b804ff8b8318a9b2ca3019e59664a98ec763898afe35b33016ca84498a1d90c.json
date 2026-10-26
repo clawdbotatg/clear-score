@@ -1,0 +1,67 @@
+{
+ "hash": "0x4b804ff8b8318a9b2ca3019e59664a98ec763898afe35b33016ca84498a1d90c",
+ "file": "registry/kiln/calldata-kiln-batch-exit.json",
+ "kind": "calldata",
+ "registry": "b70998caa5dab184243a298a0253b5530428b0f2",
+ "deployments": [
+  {
+   "chainId": 1,
+   "address": "0x004c226fff73aa94b78a4df1a0e861797ba16819"
+  },
+  {
+   "chainId": 560048,
+   "address": "0x06f9c32a3093dde837a2e172041df79b4b850a2e"
+  }
+ ],
+ "auditedBy": [
+  "0x3846c3a30e62075fa916216b35ef04b8f53931f6"
+ ],
+ "model": "claude-opus-5-5 (high)",
+ "reader": "claude-sonnet-5-5",
+ "prompt": "7bcbb754c1e7",
+ "date": "2026-10-26T15:00Z",
+ "answer": {
+  "formats": [
+   {
+    "key": "requestExit(bytes[] validators_)",
+    "effects": [
+     "Emits one ExitRequest(msg.sender, pubkey) event for each validator public key given. This is an off-chain signal asking the node operator (Kiln) to exit those validators.",
+     "No tokens or ETH move, no approval is set, and no on-chain state changes. The function is not payable and does not check that the signer owns the validators."
+    ],
+    "shown": "The screen says \"Request Validator Exit\" and lists the validator public keys as raw bytes.",
+    "findings": [],
+    "cases": [],
+    "glance": 90,
+    "depth": 90
+   }
+  ],
+  "couldNotCheck": [
+   "No source in the working directory for the chain 560048 deployment (0x06f9C32A3093DDE837a2E172041DF79B4b850A2e). I assumed it is the same ExitRequestContract as on mainnet."
+  ]
+ },
+ "cost": 0.089,
+ "account": "ethereum_foundation",
+ "seconds": 25,
+ "rubric": "v1.1",
+ "formats": {
+  "requestExit(bytes[] validators_)": {
+   "grade": "A",
+   "truth": 100,
+   "clarity": 90,
+   "measured": false,
+   "groundTruth": false,
+   "critical": 0,
+   "warnings": 0,
+   "worst": null,
+   "comprehension": null
+  }
+ },
+ "summary": {
+  "grade": "A",
+  "truth": 100,
+  "clarity": 90,
+  "functions": "1A",
+  "incomplete": true,
+  "worst": null
+ }
+}
